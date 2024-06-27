@@ -1,0 +1,149 @@
+{
+	"info": {
+		"_postman_id": "48378839-9926-4cff-a13e-0b38eab1409e",
+		"name": "trackingo-customer",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15126803"
+	},
+	"item": [
+		{
+			"name": "bus current status",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://bus.trackingo.in/api/live/eta_map?current_status=true&key=X3VVB2",
+					"protocol": "http",
+					"host": [
+						"bus",
+						"trackingo",
+						"in"
+					],
+					"path": [
+						"api",
+						"live",
+						"eta_map"
+					],
+					"query": [
+						{
+							"key": "current_status",
+							"value": "true"
+						},
+						{
+							"key": "key",
+							"value": "X3VVB2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "journey details",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://bus.trackingo.in/api/live/journey_details?key=PUCCKK&zoom_position=12&platform=mobile",
+					"protocol": "http",
+					"host": [
+						"bus",
+						"trackingo",
+						"in"
+					],
+					"path": [
+						"api",
+						"live",
+						"journey_details"
+					],
+					"query": [
+						{
+							"key": "key",
+							"value": "PUCCKK"
+						},
+						{
+							"key": "zoom_position",
+							"value": "12"
+						},
+						{
+							"key": "platform",
+							"value": "mobile"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "feedback",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"name": "Content-Type",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"type\": 2,\n  \"rating\": 1,\n  \"feature_request\": \"\",\n  \"feedback\": \"\"\n}"
+				},
+				"url": {
+					"raw": "http://bus.trackingo.in/api/live/tracking_feedback?key=ETUQEF",
+					"protocol": "http",
+					"host": [
+						"bus",
+						"trackingo",
+						"in"
+					],
+					"path": [
+						"api",
+						"live",
+						"tracking_feedback"
+					],
+					"query": [
+						{
+							"key": "key",
+							"value": "ETUQEF"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "panic",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://bus.trackingo.in/api/tracking/panic_details?short_code=BM1UN3&from_webApp=true",
+					"protocol": "http",
+					"host": [
+						"bus",
+						"trackingo",
+						"in"
+					],
+					"path": [
+						"api",
+						"tracking",
+						"panic_details"
+					],
+					"query": [
+						{
+							"key": "short_code",
+							"value": "BM1UN3"
+						},
+						{
+							"key": "from_webApp",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
