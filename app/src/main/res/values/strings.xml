@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Trackingo UI</string>
+    <string name="main_header">Trackingo</string>
+    <string name="bus_op_name">New Morning Star Travels</string>
+    <string name="tag">Trackingo for Your Safety &amp; Comfort</string>
+    <string name="option1">Boarding Directions</string>
+    <string name="option3">Share DropOff</string>
+    <string name="option2_text1">Panic</string>
+    <string name="option2_text2">In the case of emergency press this button.</string>
+    <string name="title">Title</string>
+    <string name="subtitle">Subtitle</string>
+    <string name="time">Time</string>
+    <string name="bus_number">Bus Number</string>
+    <string name="location">Location</string>
+    <string name="service_name_eg">KA-7A</string>
+    <string name="service">Service:</string>
+    <string name="feedback_text1">We Love to hear any feedback you have about Trackingo.</string>
+    <string name="feedback_text2">If you have any feedback/complaint about Bus Operator. submit it here</string>
+    <string name="download_app_text">For Booking, Tracking, Break Stops &amp; Alerts with Exclusive Offers</string>
+    <string name="disclaimer_text1">Disclaimer : TrackingGo provides information about the location,
+        arrival or delay of the bus to its passengers.</string>
+    <string name="disclaimer_text2">These services are merely for knowledge purposes and not for authentic timings.
+        So please rely only on the bus itinerary on your bus ticket.</string>
+    <string name="disclaimer_text3">The bus could be running late or can arrive early due to some unavoidable
+        circumstances like traffic, or other similar reasons that the time provided by us.</string>
+    <string name="download_mobile_app">Download Mobile App</string>
+    <string name="google_maps_api_key"></string>
+    <string name="copyright">Copyright</string>
+</resources>
