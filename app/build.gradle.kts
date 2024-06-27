@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.trackingoui"
+    namespace = "com.bitlasoft.trackingo"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.trackingoui"
+        applicationId = "com.bitlasoft.trackingo"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
