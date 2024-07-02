@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/trackingo_nav_graph"
+    app:startDestination="@id/firstFragment">
+
+    <fragment
+        android:id="@+id/firstFragment"
+        android:name="com.bitlasoft.trackingo.fragment.ShortKeyFragment"
+        android:label="Short Key Fragment"
+        tools:layout="@layout/short_key_ui">
+        <action
+            android:id="@+id/action_shortKeyFragment_to_secondFragment"
+            app:destination="@id/secondFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/secondFragment"
+        android:name="com.bitlasoft.trackingo.fragment.MapTrackingoFragment"
+        android:label="Map Tracking Fragment"
+        tools:layout="@layout/maptrackingo_fragment">
+        <action
+            android:id="@+id/action_mapTrackingoFragment_to_feedbackFragment"
+            app:destination="@id/thirdOneFragment" />
+        <action
+            android:id="@+id/action_mapTrackingoFragment_to_feedbackFutureExpectationFragment"
+            app:destination="@id/ThirdTwoFragment" />
+        <action
+            android:id="@+id/action_mapTrackingoFragment_to_zoomedMapFragment"
+            app:destination="@id/mapFragment" />
+        <action
+            android:id="@+id/action_mapTrackingoFragment_to_shortKeyFragment"
+            app:destination="@id/firstFragment"
+            app:popUpTo="@id/firstFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.bitlasoft.trackingo.fragment.ZoomedMapFragment"
+        android:label="Map Fragment"
+        tools:layout="@layout/zoomedmap_fragment">
+        <action
+            android:id="@+id/action_zoomedMapFragment_to_mapTrackingoFragment"
+            app:destination="@id/secondFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/thirdOneFragment"
+        android:name="com.bitlasoft.trackingo.fragment.FeedbackFragment"
+        android:label="Feedback Fragment"
+        tools:layout="@layout/feedback_up_request_layout">
+        <action
+            android:id="@+id/action_feedbackFragment_to_mapTrackingoFragment"
+            app:destination="@id/secondFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/ThirdTwoFragment"
+        android:name="com.bitlasoft.trackingo.fragment.FeedbackFutureExpectationFragment"
+        android:label="Feedback Future Expectation Fragment"
+        tools:layout="@layout/feedback_down_request_layout">
+        <action
+            android:id="@+id/action_feedbackFutureExpectationFragment_to_mapTrackingoFragment"
+            app:destination="@id/secondFragment" />
+    </fragment>
+
+</navigation>

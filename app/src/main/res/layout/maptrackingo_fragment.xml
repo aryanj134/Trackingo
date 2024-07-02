@@ -9,6 +9,7 @@
     android:layout_height="match_parent"
     tools:context=".fragment.MapTrackingoFragment">
 
+
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/main_header"
             android:layout_width="match_parent"
@@ -25,8 +26,8 @@
                 android:id="@+id/backBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginStart="18dp"
+                android:layout_marginTop="5dp"
                 android:background="@drawable/back_arrow"
                 />
 
@@ -34,13 +35,29 @@
                 android:id="@+id/header_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="30dp"
+                android:layout_marginStart="20dp"
+                android:padding="4dp"
                 android:text="@string/main_header"
-                android:textSize="22sp"
+                android:textSize="20sp"
                 android:textColor="@color/white"
                 />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/responseMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:textSize="18sp"
+            android:padding="4dp"
+            android:layout_marginTop="4dp"
+            android:textAlignment="center"
+            app:layout_constraintTop_toTopOf="@+id/main_header"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            />
 
 <ScrollView
     android:id="@+id/scrollView"
@@ -70,13 +87,13 @@
                 android:id="@+id/bus_operator_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="30dp"
-                android:paddingBottom="30dp"
-                android:paddingEnd="30dp"
+                android:paddingTop="28dp"
+                android:paddingBottom="28dp"
+                android:paddingEnd="50dp"
                 android:paddingStart="16dp"
                 android:text="@string/bus_op_name"
                 android:textColor="#3E83EC"
-                android:textSize="24sp"
+                android:textSize="22sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -84,13 +101,13 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/main_logo"
-                android:layout_width="60dp"
-                android:layout_height="80dp"
+                android:layout_width="50dp"
+                android:layout_height="66dp"
+                android:background="@drawable/trackingo_icon"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/bus_operator_name"
-                app:layout_constraintTop_toTopOf="parent"
-                android:background="@drawable/trackingo_icon"/>
+                app:layout_constraintStart_toEndOf="@+id/bus_operator_name"
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -98,6 +115,7 @@
             android:id="@+id/service_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="6dp"
             app:layout_constraintTop_toBottomOf="@+id/bus_operator_details"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -121,7 +139,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 android:layout_marginTop="8dp"
                 android:layout_marginStart="4dp"
-                android:textSize="15sp"
+                android:textSize="14sp"
                 app:layout_constraintTop_toBottomOf="@+id/tagline"
                 android:text="@string/service" />
 
@@ -131,7 +149,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginStart="5dp"
-                android:textSize="15sp"
+                android:textSize="14sp"
                 app:layout_constraintTop_toBottomOf="@id/tagline"
                 app:layout_constraintStart_toEndOf="@id/fixed_text"
                 android:hint="@string/service_name_eg" />
@@ -141,7 +159,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textSize="15sp"
+                android:textSize="14sp"
                 app:layout_constraintTop_toBottomOf="@id/fixed_text"
                 app:layout_constraintStart_toStartOf="parent"
                 android:drawableStart="@drawable/location"
@@ -155,7 +173,7 @@
                 app:layout_constraintTop_toBottomOf="@id/location"
                 app:layout_constraintStart_toStartOf="parent"
                 android:layout_marginStart="4dp"
-                android:textSize="12sp"
+                android:textSize="10sp"
                 android:hint="@string/location" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -166,7 +184,7 @@
                 app:layout_constraintTop_toBottomOf="@id/copy_location"
                 app:layout_constraintStart_toStartOf="parent"
                 android:drawableStart="@drawable/baseline_directions_bus_24"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 android:hint="@string/bus_number" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -178,7 +196,7 @@
                 app:layout_constraintTop_toBottomOf="@id/copy_location"
                 app:layout_constraintStart_toEndOf="@+id/bus_number"
                 android:layout_marginStart="5dp"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 android:hint="@string/time" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -216,7 +234,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:cardBackgroundColor="@color/blue">
+                app:cardBackgroundColor="@color/blue_tracking_o">
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
@@ -226,7 +244,7 @@
                     android:textAlignment="center"
                     android:textColor="@color/white"
                     android:textSize="12sp"
-                    android:padding="4dp"
+                    android:padding="6dp"
                     android:drawableTop="@drawable/baseline_my_location_24"/>
 
             </androidx.cardview.widget.CardView>
@@ -249,7 +267,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"
-                    android:paddingTop="4dp"
+                    android:paddingTop="10dp"
                     android:layout_gravity="center_horizontal"
                     android:text="@string/option2_text1"
                     android:textSize="16sp"/>
@@ -258,10 +276,10 @@
                     android:id="@+id/option2_text2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
+                    android:layout_marginTop="25dp"
                     android:gravity="center"
                     android:textAlignment="center"
-                    android:padding="3dp"
+                    android:padding="4dp"
                     android:text="@string/option2_text2"
                     android:textSize="12sp"
                     android:textColor="@color/white" />
@@ -291,8 +309,8 @@
                     android:gravity="center"
                     android:textAlignment="center"
                     android:text="@string/option3"
-                    android:padding="6dp"
-                    android:textSize="12sp"/>
+                    android:padding="8dp"
+                    android:textSize="11sp"/>
 
             </androidx.cardview.widget.CardView>
 
@@ -302,7 +320,7 @@
             android:id="@+id/list_cities"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="30dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/user_options"
@@ -313,7 +331,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginStart="10dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -327,6 +344,7 @@
             android:id="@+id/busTrackingMap"
             android:layout_width="match_parent"
             android:layout_height="300dp"
+            android:layout_marginTop="30dp"
             app:layout_constraintTop_toBottomOf="@id/list_cities"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -417,6 +435,8 @@
                 android:id="@+id/feedback_text1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clickable="true"
+                android:linksClickable="true"
                 android:layout_marginTop="24dp"
                 android:textSize="16sp"
                 android:layout_marginStart="20dp"
@@ -430,6 +450,8 @@
                 android:id="@+id/feedback_text2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clickable="true"
+                android:linksClickable="true"
                 android:layout_marginTop="4dp"
                 android:textSize="16sp"
                 android:layout_marginStart="20dp"
@@ -509,4 +531,17 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>
+
+    <include
+        android:id="@+id/loadingBar"
+        layout="@layout/item_loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone"
+        />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

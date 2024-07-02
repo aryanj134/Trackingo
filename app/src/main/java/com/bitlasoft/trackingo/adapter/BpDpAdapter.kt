@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bitlasoft.trackingo.domain.pojo.response.LocTime
+import com.bitlasoft.trackingo.domain.pojo.location_data.response.LocTime
 import com.bitlasoft.trackingo.databinding.ItemLayoutBinding
 
 class BpDpAdapter(private var itemList: List<LocTime>): RecyclerView.Adapter<BpDpAdapter.ViewHolder>() {

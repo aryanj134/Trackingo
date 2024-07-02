@@ -1,4 +1,4 @@
-package com.bitlasoft.trackingo.domain.pojo.response
+package com.bitlasoft.trackingo.domain.pojo.location_data.response
 
 import com.google.gson.annotations.SerializedName
 
