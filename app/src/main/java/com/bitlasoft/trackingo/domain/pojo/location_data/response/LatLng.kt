@@ -30,12 +30,27 @@ data class ServiceDetails(
     val srcName : String?
 )
 
+data class Details(
+    @SerializedName("details")
+    val details: ServiceInfo?,
+)
+data class ServiceInfo(
+    @SerializedName("speed")
+    val speed: Int?,
+
+    @SerializedName("timestamp")
+    val dateTime: String?
+)
+
 data class Coordinates(
     @SerializedName("journey_details")
     val journeyDetails : ServiceDetails?,
 
     @SerializedName("all_service_places")
     val coordinates : List<LatLng>?,
+
+    @SerializedName("track_customer")
+    val bustracking : ArrayList<Details?>?,
 
     @SerializedName("status")
     val status: Int?,

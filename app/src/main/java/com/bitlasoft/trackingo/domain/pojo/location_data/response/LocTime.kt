@@ -6,12 +6,27 @@ data class LocationTimeDetails(
     @SerializedName("eta_map_data")
     val locationTimeDetails : List<LocTime>?,
 
+    @SerializedName("current_status_details")
+    val currentCoordinates: ServiceLocation?,
+
+    @SerializedName("current_sp_id")
+    val curr_sp_id: Int?,
+
+    @SerializedName("is_passed")
+    val is_passed: Boolean?,
+
     @SerializedName("status")
     val status: Int?,
 
     @SerializedName("message")
     val message: String?
 )
+
+data class ServiceLocation(
+    @SerializedName("lat_long")
+    val currentLoc : List<Double?>
+)
+
 
 data class LocTime (
 
@@ -20,6 +35,9 @@ data class LocTime (
 
     @SerializedName("running_status")
     val subtitle: String?,
+
+    @SerializedName("id")
+    val id: Int?,
 
     @SerializedName("skipped")
     val skippedStatus: Boolean?,

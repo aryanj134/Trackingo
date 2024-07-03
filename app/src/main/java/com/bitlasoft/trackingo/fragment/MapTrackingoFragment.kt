@@ -17,19 +17,19 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bitlasoft.trackingo.R
+import com.bitlasoft.trackingo.activity.MainActivity
 import com.bitlasoft.trackingo.adapter.BpDpAdapter
+import com.bitlasoft.trackingo.databinding.ItemLayoutBinding
 import com.bitlasoft.trackingo.databinding.MaptrackingoFragmentBinding
 import com.bitlasoft.trackingo.databinding.TrankingoDialogPnrBinding
-import com.bitlasoft.trackingo.utils.Constants
+import com.bitlasoft.trackingo.utils.isInternetAvailable
 import com.bitlasoft.trackingo.viewModel.CoordinatesViewModel
 import com.bitlasoft.trackingo.viewModel.LocationTimeViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -37,17 +37,23 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import com.bitlasoft.trackingo.viewModel.SharedViewModel
 
-class MapTrackingoFragment: Fragment() {
-    private lateinit var _binding: MaptrackingoFragmentBinding
-//    private val binding get() = _binding!!
+class MapTrackingoFragment : Fragment() {
+
+
+    private val _binding by lazy { MaptrackingoFragmentBinding.inflate(layoutInflater) }
+
+    //    private val binding get() = _binding!!
+    private lateinit var itemLayoutBinding: ItemLayoutBinding
     private val locTimeViewModel: LocationTimeViewModel by viewModel()
-    private val coordinatesViewModel : CoordinatesViewModel by viewModel()
-    private val sharedViewModel: SharedViewModel by activityViewModels()
-    private lateinit var googleMap: GoogleMap
+    private val coordinatesViewModel: CoordinatesViewModel by viewModel()
+    private var googleMap: GoogleMap? = null
     private var mapView: MapView? = null
+    private var isDialogShown = true
+    var isPnr = false
+    var shortKey = ""
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,59 +61,78 @@ class MapTrackingoFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View {
         //Inflating the layout
-        if(this::_binding.isInitialized.not()) {
-            _binding = MaptrackingoFragmentBinding.inflate(inflater, container, false)
+        //Setting the recyclerView layout as Horizontal
+        val horizontalLayoutManager =
+            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        _binding.recyclerView.layoutManager = horizontalLayoutManager
 
-            //Setting the recyclerView layout as Horizontal
-            val horizontalLayoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-            _binding.recyclerView.layoutManager = horizontalLayoutManager
+        observer()
 
-            // Fetch Data
-            locTimeViewModel.getLocationTimeDetails(true, Constants.SHORT_KEY)
-            mapView = _binding.mapLayoutView
-            mapView?.onCreate(savedInstanceState)
-            mapView?.getMapAsync { map ->
-                googleMap = map
-
-                coordinatesViewModel.getCoordinates(Constants.SHORT_KEY, 12, "mobile")
-//                googleMap.uiSettings.isZoomControlsEnabled = true
-//                googleMap.uiSettings.isCompassEnabled = true
-//                googleMap.uiSettings.isZoomGesturesEnabled = true
-//                googleMap.uiSettings.isMapToolbarEnabled = false
-//                googleMap.uiSettings.isScrollGesturesEnabled = true
-                googleMap.uiSettings.apply {
-                    isZoomControlsEnabled = true
-                    isCompassEnabled = true
-                    isZoomGesturesEnabled = true
-                    isMapToolbarEnabled = false
-                    isScrollGesturesEnabled = true
-                }
-            }
-        }
         return _binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        if (arguments!=null && arguments?.containsKey("type")==true ){
+            isPnr = arguments?.getString("type").equals("pnr",false)
+            if (isPnr){
+                // later implementation
+            } else{
+                shortKey = arguments?.getString("shortKey")?:""
+            }
+        }
+        mapView = _binding.mapLayoutView
+        mapView?.onCreate(savedInstanceState)
+        mapView?.getMapAsync { map ->
+            googleMap = map
+            locTimeViewModel.getLocationTimeDetails(true, shortKey)
+
+            googleMap?.uiSettings?.apply {
+                isZoomControlsEnabled = true
+                isCompassEnabled = true
+                isZoomGesturesEnabled = true
+                isScrollGesturesEnabled = true
+                isMyLocationButtonEnabled = true
+            }
+        }
+
         // Back Button to ShortKeyFragment
         _binding.backBtn.setOnClickListener {
-            findNavController().navigate(R.id.action_mapTrackingoFragment_to_shortKeyFragment)
+            findNavController().popBackStack()
         }
 
         setUpButtonClick()
-
         textSpan()
         setUpObserver()
     }
 
-    private fun showMessage(message : String?) {
+    private fun showMessage(message: String?) {
         _binding.scrollView.visibility = View.GONE
         Handler().postDelayed({
             _binding.loadingBar.mainProgressBarLayout.visibility = View.GONE
             _binding.responseMessage.visibility = View.VISIBLE
             _binding.responseMessage.text = message
-        }, 500)
+        }, 400)
+    }
+
+    private fun observer() {
+        lifecycleScope.launch {
+            if (!isInternetAvailable(requireContext())){
+                _binding.loadingBar.mainProgressBarLayout.visibility = View.GONE
+
+                showMessage("Something is Technically Wrong, We are going to fix it up and things will be normal soon.")
+            }
+            MainActivity.isInternet.collect {
+                if (it) {
+                    _binding.responseMessage.visibility = View.GONE
+                    locTimeViewModel.getLocationTimeDetails(true, shortKey)
+
+                } else {
+                    showMessage("Something is Technically Wrong, We are going to fix it up and things will be normal soon.")
+                }
+            }
+        }
     }
 
     private fun setUpButtonClick() {
@@ -116,7 +141,7 @@ class MapTrackingoFragment: Fragment() {
             showPanicDialog()
         }
         //Map Zoom In Button
-        _binding.zoomInBtn.setOnClickListener{
+        _binding.zoomInBtn.setOnClickListener {
             findNavController().navigate(R.id.action_mapTrackingoFragment_to_zoomedMapFragment)
         }
     }
@@ -160,19 +185,20 @@ class MapTrackingoFragment: Fragment() {
 
     private fun textSpan() {
         // Initialize SpannableStringBuilders
-         val spannableStringBuilder1 = SpannableStringBuilder(_binding.feedbackText1.text)
-         val spannableStringBuilder2 = SpannableStringBuilder(_binding.feedbackText2.text)
-         val spannableStringBuilder3 = SpannableStringBuilder(_binding.disclaimerText1.text)
+        val spannableStringBuilder1 = SpannableStringBuilder(_binding.feedbackText1.text)
+        val spannableStringBuilder2 = SpannableStringBuilder(_binding.feedbackText2.text)
+        val spannableStringBuilder3 = SpannableStringBuilder(_binding.disclaimerText1.text)
 
         // Creating spans
         val boldSpan = StyleSpan(Typeface.BOLD)
         val sizeSpan = AbsoluteSizeSpan(28)
         // Apply ClickableSpan to the "feedback" part
-         val clickableSpan1 = object : ClickableSpan() {
+        val clickableSpan1 = object : ClickableSpan() {
             override fun onClick(widget: View) {
-            // Click will redirect to 1st feedback fragment
+                // Click will redirect to 1st feedback fragment
                 findNavController().navigate(R.id.action_mapTrackingoFragment_to_feedbackFutureExpectationFragment)
             }
+
             override fun updateDrawState(ds: TextPaint) {
                 super.updateDrawState(ds)
                 ds.color = ContextCompat.getColor(context!!, R.color.blue) // Change the link color
@@ -185,6 +211,7 @@ class MapTrackingoFragment: Fragment() {
                 // Click will redirect to 2nd feedback fragment
                 findNavController().navigate(R.id.action_mapTrackingoFragment_to_feedbackFragment)
             }
+
             override fun updateDrawState(ds: TextPaint) {
                 super.updateDrawState(ds)
                 ds.color = ContextCompat.getColor(context!!, R.color.blue) // Change the link color
@@ -228,23 +255,118 @@ class MapTrackingoFragment: Fragment() {
         _binding.feedbackText2.movementMethod = LinkMovementMethod.getInstance()
     }
 
-    private fun resizeCustomMarker(drawableRes: Int, width: Int, height: Int) : Bitmap {
-        return Bitmap.createScaledBitmap(BitmapFactory.decodeResource(resources, drawableRes), width, height, false)
+    private fun resizeCustomMarker(drawableRes: Int, width: Int, height: Int): Bitmap {
+        return Bitmap.createScaledBitmap(
+            BitmapFactory.decodeResource(resources, drawableRes),
+            width,
+            height,
+            false
+        )
     }
 
     private fun setUpObserver() {
+
+        val arrivalTime: MutableList<String?> = mutableListOf()
+        val deptTime: MutableList<String?> = mutableListOf()
+        val scheduledTime: MutableList<String?> = mutableListOf()
+        var speed: Int = 0
+        var dateTime: String? = null
+
         locTimeViewModel.fetchDetailsResponse.observe(requireActivity()) { response ->
             when (response?.status) {
                 200 -> {
+                    _binding.loadingBar.mainProgressBarLayout.visibility = View.GONE
+                    coordinatesViewModel.getCoordinates(shortKey, 12, "mobile")
+
                     Log.d("tag", "Fetching data of location and time")
                     _binding.scrollView.visibility = View.VISIBLE
                     val adapter = BpDpAdapter(emptyList())
                     _binding.recyclerView.adapter = adapter
                     response.locationTimeDetails?.let { adapter.updateData(it) }
+                    for (i in response.locationTimeDetails?.indices!!) {
+                        arrivalTime.add(response.locationTimeDetails[i].arrivalTime)
+                        deptTime.add(response.locationTimeDetails[i].deptTime)
+                        scheduledTime.add(response.locationTimeDetails[i].scheduledTime)
+                    }
+
+                    response.currentCoordinates?.currentLoc?.let {
+                        val markerOptions = MarkerOptions()
+                            .position(
+                                com.google.android.gms.maps.model.LatLng(
+                                    it[0]!!,
+                                    it[1]!!
+                                )
+                            )
+                            .title("speed: $speed\n km/hr \n Time: $dateTime")
+                            .snippet("")
+                            .icon(
+                                BitmapDescriptorFactory.fromBitmap(
+                                    resizeCustomMarker(
+                                        R.drawable.bus,
+                                        80,
+                                        100
+                                    )
+                                )
+                            )
+                        googleMap?.addMarker(markerOptions)
+                        googleMap?.moveCamera(
+                            CameraUpdateFactory.newLatLngZoom(
+                                com.google.android.gms.maps.model.LatLng(
+                                    it[0]!!,
+                                    it[1]!!
+                                ), 14f
+                            )
+                        )
+                    }
+
+                    for (i in response.locationTimeDetails.indices) {
+                        if (response.curr_sp_id == response.locationTimeDetails[i].id) {
+                            if (adapter.itemCount > 0) {
+                                val itemView =
+                                    _binding.recyclerView.findViewHolderForAdapterPosition(i)?.itemView
+                                if (itemView != null) {
+                                    itemLayoutBinding = ItemLayoutBinding.bind(itemView)
+                                    itemLayoutBinding.busTracker.visibility = View.VISIBLE
+                                    if (response.is_passed == false)
+                                        itemLayoutBinding.busTracker.translationX =
+                                            itemLayoutBinding.trackingDividerMain.width * 0.15f
+                                    else
+                                        itemLayoutBinding.circleView.translationX =
+                                            itemLayoutBinding.circleView.width * 0.5f
+                                }
+                            }
+                        } else {
+                            if (adapter.itemCount > 0) {
+                                val itemView =
+                                    _binding.recyclerView.findViewHolderForAdapterPosition(i)?.itemView
+                                if (itemView != null) {
+                                    itemLayoutBinding = ItemLayoutBinding.bind(itemView)
+                                    itemLayoutBinding.busTracker.visibility = View.INVISIBLE
+                                }
+                            }
+                        }
+
+                        if (response.locationTimeDetails[i].skippedStatus == true) {
+                            if (adapter.itemCount > 0) {
+                                val itemView =
+                                    _binding.recyclerView.findViewHolderForAdapterPosition(0)?.itemView
+                                if (itemView != null) {
+                                    itemLayoutBinding = ItemLayoutBinding.bind(itemView)
+                                    itemLayoutBinding.busTracker.visibility = View.VISIBLE
+                                    itemLayoutBinding.busTracker.translationX =
+                                        itemLayoutBinding.trackingDividerMain.width * 0.5f
+                                    itemLayoutBinding.circleView.background =
+                                        ContextCompat.getDrawable(requireContext(), R.color.red)
+                                }
+                            }
+                        }
+                    }
                 }
+
                 302, 500 -> {
                     Log.d("tag", "Message received")
                 }
+
                 else -> {
                     Log.e("tag", "Error")
                 }
@@ -252,15 +374,20 @@ class MapTrackingoFragment: Fragment() {
         }
 
         coordinatesViewModel.fetchCoordinatesResponse.observe(requireActivity()) {
-            it?.getContentIfNotHandled()?.let {response ->
-                when (response?.status) {
+            it?.getContentIfNotHandled()?.let { response ->
+                when (response.status) {
                     200 -> {
                         _binding.loadingBar.mainProgressBarLayout.visibility = View.GONE
                         Log.d("tag", "Fetching data of coordinates")
                         _binding.scrollView.visibility = View.VISIBLE
 
-                        response.journeyDetails?.let{
-                            _binding.apply{
+                        if (response.bustracking?.isNotEmpty() == true) {
+                            speed = response.bustracking[0]?.details?.speed!!
+                            dateTime = response.bustracking[0]?.details?.dateTime!!
+                        }
+
+                        response.journeyDetails?.let {
+                            _binding.apply {
                                 serviceName.text = it.serviceNum
                                 location.text = it.srcName
                                 copyLocation.text = it.srcAddress
@@ -269,40 +396,59 @@ class MapTrackingoFragment: Fragment() {
                             }
                         }
 
-                        response.coordinates?.let{ locations ->
-                            if(::googleMap.isInitialized) {
-                                googleMap.clear()
-                                for(latLng in locations) {
+                        response.coordinates?.let { locations ->
+                            var i = 0
+                            for (latLng in locations) {
+                                if (latLng.stageType == "boarding") {
                                     latLng.lat_long?.let {
                                         val markerOptions = MarkerOptions()
-                                            .position(com.google.android.gms.maps.model.LatLng(it[0], it[1]))
+                                            .position(
+                                                com.google.android.gms.maps.model.LatLng(
+                                                    it[0],
+                                                    it[1]
+                                                )
+                                            )
                                             .title(latLng.servicePlace)
-                                            .snippet(latLng.stageType)
-                                            .icon(BitmapDescriptorFactory.fromBitmap(resizeCustomMarker(R.drawable.pick, 50, 50)))
-                                        googleMap.addMarker(markerOptions)
+                                            .snippet("Scheduled Time:\n${scheduledTime[i]}")
+                                            .icon(
+                                                BitmapDescriptorFactory.fromBitmap(
+                                                    resizeCustomMarker(R.drawable.pick, 60, 60)
+                                                )
+                                            )
+                                        googleMap?.addMarker(markerOptions)
+                                        i++
                                     }
-                                }
-                                if(locations.isNotEmpty()) {
-                                    locations[0].lat_long?.let {
+                                } else if (latLng.stageType == "dropoff") {
+                                    latLng.lat_long?.let {
                                         val markerOptions = MarkerOptions()
-                                            .position(com.google.android.gms.maps.model.LatLng(it[0], it[1]))
-                                            .title(locations[0].servicePlace)
-                                            .snippet(locations[0].stageType)
-                                            .icon(BitmapDescriptorFactory.fromBitmap(resizeCustomMarker(R.drawable.bus, 50, 50)))
-                                        googleMap.addMarker(markerOptions)
-                                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(com.google.android.gms.maps.model.LatLng(it[0], it[1]), 12f))
+                                            .position(
+                                                com.google.android.gms.maps.model.LatLng(
+                                                    it[0],
+                                                    it[1]
+                                                )
+                                            )
+                                            .title(latLng.servicePlace)
+                                            .snippet("Scheduled Time:\n${scheduledTime[i]}")
+                                            .icon(
+                                                BitmapDescriptorFactory.fromBitmap(
+                                                    resizeCustomMarker(R.drawable.drop, 60, 60)
+                                                )
+                                            )
+                                        googleMap?.addMarker(markerOptions)
+                                        i++
                                     }
                                 }
                             }
                         }
-
-                        showDialog()
-                        sharedViewModel.setDialogShown(false) // Reset the flag
+                        if (isDialogShown)
+                            showDialog()
                     }
+
                     302, 500 -> {
                         Log.d("tag", "Message received")
                         showMessage(response.message)
                     }
+
                     else -> {
                         Log.e("tag", "Error")
                     }
@@ -318,6 +464,7 @@ class MapTrackingoFragment: Fragment() {
 
     override fun onPause() {
         super.onPause()
+        isDialogShown = false
         mapView?.onPause()
     }
 

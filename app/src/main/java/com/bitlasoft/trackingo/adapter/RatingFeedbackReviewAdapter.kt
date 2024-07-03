@@ -21,57 +21,97 @@ class RatingFeedbackReviewAdapter(private val clickListener: FeedbackRatingClick
             binding.ratingTitle.text = "How do you rate Trackingo service?"
 
             val selectedDrawableLeft = R.drawable.rated_square_left_box
-            val selectedDrawableMiddle = R.drawable.rated_square_box
+            val selectedDrawable = R.drawable.rated_square_box
             val selectedDrawableRight = R.drawable.rated_square_right_box
 
             val unselectedDrawableLeft = R.drawable.rating_square_left_border
-            val unselectedDrawableMiddle = R.drawable.rating_square_box
+            val unselectedDrawable = R.drawable.rating_square_box
             val unselectedDrawableRight = R.drawable.rating_square_right_border
 
             binding.rating1.apply {
-                setOnClickListener { handleRatingClick(1) }
-                background = if (1 <= selectedRating) {
+                setOnClickListener{ handleRatingClick(1) }
+                background = if(selectedRating == 1)
                     ContextCompat.getDrawable(context, selectedDrawableLeft)
-                } else {
+                else
                     ContextCompat.getDrawable(context, unselectedDrawableLeft)
-                }
             }
 
             binding.rating2.apply {
-                setOnClickListener { handleRatingClick(2) }
-                background = if (2 <= selectedRating) {
-                    ContextCompat.getDrawable(context, selectedDrawableMiddle)
-                } else {
-                    ContextCompat.getDrawable(context, unselectedDrawableMiddle)
-                }
+                setOnClickListener{ handleRatingClick(2) }
+                background = if(selectedRating == 2)
+                    ContextCompat.getDrawable(context, selectedDrawable)
+                else
+                    ContextCompat.getDrawable(context, unselectedDrawable)
             }
 
             binding.rating3.apply {
-                setOnClickListener { handleRatingClick(3) }
-                background = if (3 <= selectedRating) {
-                    ContextCompat.getDrawable(context, selectedDrawableMiddle)
-                } else {
-                    ContextCompat.getDrawable(context, unselectedDrawableMiddle)
-                }
+                setOnClickListener{ handleRatingClick(3) }
+                background = if(selectedRating == 3)
+                    ContextCompat.getDrawable(context, selectedDrawable)
+                else
+                    ContextCompat.getDrawable(context, unselectedDrawable)
             }
 
             binding.rating4.apply {
-                setOnClickListener { handleRatingClick(4) }
-                background = if (4 <= selectedRating) {
-                    ContextCompat.getDrawable(context, selectedDrawableMiddle)
-                } else {
-                    ContextCompat.getDrawable(context, unselectedDrawableMiddle)
-                }
+                setOnClickListener{ handleRatingClick(4) }
+                background = if(selectedRating == 4)
+                    ContextCompat.getDrawable(context, selectedDrawable)
+                else
+                    ContextCompat.getDrawable(context, unselectedDrawable)
             }
 
             binding.rating5.apply {
-                setOnClickListener { handleRatingClick(5) }
-                background = if (5 <= selectedRating) {
+                setOnClickListener{ handleRatingClick(5) }
+                background = if(selectedRating == 5)
                     ContextCompat.getDrawable(context, selectedDrawableRight)
-                } else {
+                else
                     ContextCompat.getDrawable(context, unselectedDrawableRight)
-                }
             }
+
+//            binding.rating1.apply {
+//                setOnClickListener { handleRatingClick(1) }
+//                background = if (1 <= selectedRating) {
+//                    ContextCompat.getDrawable(context, selectedDrawableLeft)
+//                } else {
+//                    ContextCompat.getDrawable(context, unselectedDrawableLeft)
+//                }
+//            }
+//
+//            binding.rating2.apply {
+//                setOnClickListener { handleRatingClick(2) }
+//                background = if (2 <= selectedRating) {
+//                    ContextCompat.getDrawable(context, selectedDrawable)
+//                } else {
+//                    ContextCompat.getDrawable(context, unselectedDrawable)
+//                }
+//            }
+//
+//            binding.rating3.apply {
+//                setOnClickListener { handleRatingClick(3) }
+//                background = if (3 <= selectedRating) {
+//                    ContextCompat.getDrawable(context, selectedDrawable)
+//                } else {
+//                    ContextCompat.getDrawable(context, unselectedDrawable)
+//                }
+//            }
+//
+//            binding.rating4.apply {
+//                setOnClickListener { handleRatingClick(4) }
+//                background = if (4 <= selectedRating) {
+//                    ContextCompat.getDrawable(context, selectedDrawable)
+//                } else {
+//                    ContextCompat.getDrawable(context, unselectedDrawable)
+//                }
+//            }
+//
+//            binding.rating5.apply {
+//                setOnClickListener { handleRatingClick(5) }
+//                background = if (5 <= selectedRating) {
+//                    ContextCompat.getDrawable(context, selectedDrawableRight)
+//                } else {
+//                    ContextCompat.getDrawable(context, unselectedDrawableRight)
+//                }
+//            }
         }
 
         private fun handleRatingClick(rating: Int) {

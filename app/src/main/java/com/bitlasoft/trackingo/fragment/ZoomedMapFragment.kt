@@ -3,16 +3,16 @@ package com.bitlasoft.trackingo.fragment
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bitlasoft.trackingo.R
-import com.bitlasoft.trackingo.databinding.MaptrackingoFragmentBinding
 import com.bitlasoft.trackingo.databinding.ZoomedmapFragmentBinding
+import com.bitlasoft.trackingo.utils.Constants
 import com.bitlasoft.trackingo.viewModel.CoordinatesViewModel
+import com.bitlasoft.trackingo.viewModel.LocationTimeViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
@@ -20,12 +20,12 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.MarkerOptions
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
+
 class ZoomedMapFragment: Fragment() {
     private lateinit var _binding: ZoomedmapFragmentBinding
-//    private var _mapTrackingoBinding: MaptrackingoFragmentBinding? = null
-//    private val maptrackingoBinding get() = _mapTrackingoBinding!!
     private val coordinatesViewModel : CoordinatesViewModel by viewModel()
-    private lateinit var googleMap: GoogleMap
+    private val locTimeViewModel: LocationTimeViewModel by viewModel()
+    private var googleMap: GoogleMap? = null
     private var mapView: MapView? = null
 
     override fun onCreateView(
@@ -40,64 +40,117 @@ class ZoomedMapFragment: Fragment() {
         mapView?.onCreate(savedInstanceState)
         mapView?.getMapAsync { map ->
             googleMap = map
-            coordinatesViewModel.getCoordinates("",12, "mobile")
-            googleMap.uiSettings.apply {
+            coordinatesViewModel.getCoordinates(Constants.SHORT_KEY,12, "mobile")
+            googleMap?.uiSettings?.apply {
                 isZoomControlsEnabled = true
+                isMyLocationButtonEnabled = true
                 isCompassEnabled = true
+                isMapToolbarEnabled = true
                 isZoomGesturesEnabled = true
-                isMapToolbarEnabled = false
                 isScrollGesturesEnabled = true
             }
         }
         _binding.zoomOutBtn.setOnClickListener {
-            findNavController().navigate(R.id.action_zoomedMapFragment_to_mapTrackingoFragment)
+            findNavController().popBackStack()
         }
         return _binding.root
     }
 
     private fun setUpObserver() {
-        coordinatesViewModel.fetchCoordinatesResponse.observe(viewLifecycleOwner) {
-            it?.getContentIfNotHandled()?.let { response ->
-            response.coordinates?.let { locations ->
-                if (::googleMap.isInitialized) {
-                    googleMap.clear()
-                    for (latLng in locations) {
-                        latLng.lat_long?.let {
-                            val markerOptions = MarkerOptions().position(
-                                com.google.android.gms.maps.model.LatLng(it[0], it[1])
-                            )
-                                .title(latLng.servicePlace).snippet(latLng.stageType)
-                                .icon(
-                                    BitmapDescriptorFactory.fromBitmap(
-                                        resizeCustomMarker(R.drawable.pick, 50, 50)
-                                    )
-                                )
-                            googleMap.addMarker(markerOptions)
-                        }
+        val arrivalTime: MutableList<String?> = mutableListOf()
+        val deptTime: MutableList<String?> = mutableListOf()
+        val scheduledTime: MutableList<String?> = mutableListOf()
+
+        locTimeViewModel.fetchDetailsResponse.observe(requireActivity()) { response ->
+            when (response?.status) {
+                200 -> {
+                    for (i in response.locationTimeDetails?.indices!!) {
+                        arrivalTime.add(response.locationTimeDetails[i].arrivalTime)
+                        deptTime.add(response.locationTimeDetails[i].deptTime)
+                        scheduledTime.add(response.locationTimeDetails[i].scheduledTime)
                     }
-                    if (locations.isNotEmpty()) {
-                        locations[0].lat_long?.let {
+
+                    response.currentCoordinates?.currentLoc?.let {
                             val markerOptions = MarkerOptions()
-                                .position(com.google.android.gms.maps.model.LatLng(it[0], it[1]))
-                                .title(locations[0].servicePlace)
-                                .snippet(locations[0].stageType)
-                                .icon(
-                                    BitmapDescriptorFactory.fromBitmap(
-                                        resizeCustomMarker(R.drawable.bus, 50, 50)
+                                .position(
+                                    com.google.android.gms.maps.model.LatLng(
+                                        it[0]!!,
+                                        it[1]!!
                                     )
                                 )
-                            googleMap.addMarker(markerOptions)
-                            googleMap.moveCamera(
+                                .title("")
+                                .snippet("")
+                                .icon(
+                                    BitmapDescriptorFactory.fromBitmap(
+                                        resizeCustomMarker(
+                                            R.drawable.bus,
+                                            60,
+                                            80
+                                        )
+                                    )
+                                )
+                            googleMap?.addMarker(markerOptions)
+                            googleMap?.moveCamera(
                                 CameraUpdateFactory.newLatLngZoom(
                                     com.google.android.gms.maps.model.LatLng(
-                                        it[0],
-                                        it[1]
-                                    ), 12f
+                                        it[0]!!,
+                                        it[1]!!
+                                    ), 18f
                                 )
                             )
+                    }
+
+                    coordinatesViewModel.fetchCoordinatesResponse.observe(requireActivity()) {
+                        it?.getContentIfNotHandled()?.let { response ->
+                            if (response.status == 200) {
+                                response.coordinates?.let { locations ->
+                                        var i = 0
+                                        for (latLng in locations) {
+                                            if(latLng.stageType == "boarding") {
+                                                latLng.lat_long?.let {
+                                                    val markerOptions = MarkerOptions()
+                                                        .position(
+                                                            com.google.android.gms.maps.model.LatLng(
+                                                                it[0],
+                                                                it[1]
+                                                            )
+                                                        )
+                                                        .title(latLng.servicePlace)
+                                                        .snippet("Scheduled Time:\n${scheduledTime[i]}")
+                                                        .icon(
+                                                            BitmapDescriptorFactory.fromBitmap(
+                                                                resizeCustomMarker(R.drawable.pick, 60, 60)
+                                                            )
+                                                        )
+                                                    googleMap?.addMarker(markerOptions)
+                                                    i++
+                                                }
+                                            }
+                                            else if(latLng.stageType == "dropoff"){
+                                                latLng.lat_long?.let {
+                                                    val markerOptions = MarkerOptions()
+                                                        .position(
+                                                            com.google.android.gms.maps.model.LatLng(
+                                                                it[0],
+                                                                it[1]
+                                                            )
+                                                        )
+                                                        .title(latLng.servicePlace)
+                                                        .snippet("Scheduled Time:\n${scheduledTime[i]}")
+                                                        .icon(
+                                                            BitmapDescriptorFactory.fromBitmap(
+                                                                resizeCustomMarker(R.drawable.drop, 60, 60)
+                                                            )
+                                                        )
+                                                    googleMap?.addMarker(markerOptions)
+                                                    i++
+                                                }
+                                            }
+                                        }
+                                    }
+                            }
                         }
                     }
-                }
                 }
             }
         }
@@ -121,5 +174,4 @@ class ZoomedMapFragment: Fragment() {
         super.onDestroyView()
         mapView?.onDestroy()
     }
-
 }

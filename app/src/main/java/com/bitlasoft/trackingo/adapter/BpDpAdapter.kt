@@ -20,6 +20,7 @@ class BpDpAdapter(private var itemList: List<LocTime>): RecyclerView.Adapter<BpD
         val dividerView = binding.trackingDividerMain
         val busIcon = binding.busTracker
         val verticalGuideline = binding.guidelineVertical
+        val checkLogo = binding.circleView
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -35,19 +36,18 @@ class BpDpAdapter(private var itemList: List<LocTime>): RecyclerView.Adapter<BpD
             if(position == 0) {
                 smallDividerView.visibility = View.INVISIBLE
             } else{
-                busIcon.visibility = View.GONE
                 verticalGuideline.visibility = View.GONE
                 smallDividerView.visibility = View.VISIBLE
             }
             if (position % 2 == 0) {
                 oddTitleTextView.text = currentItem.title
-                oddSubtitleTextView.text = currentItem.subtitle
+                oddSubtitleTextView.text = "Scheduled at " + currentItem.scheduledTime
                 oddCardView.visibility = View.VISIBLE
                 evenCardView.visibility = View.INVISIBLE
             }
             else {
                 evenTitleTextView.text = currentItem.title
-                evenSubtitleTextView.text = currentItem.subtitle
+                evenSubtitleTextView.text = "Scheduled at " + currentItem.scheduledTime
                 oddCardView.visibility = View.INVISIBLE
                 evenCardView.visibility = View.VISIBLE
             }

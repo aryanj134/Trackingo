@@ -67,6 +67,7 @@
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintBottom_toBottomOf="parent"
+    android:visibility="gone"
     >
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -89,7 +90,7 @@
                 android:layout_height="wrap_content"
                 android:paddingTop="28dp"
                 android:paddingBottom="28dp"
-                android:paddingEnd="50dp"
+                android:paddingEnd="60dp"
                 android:paddingStart="16dp"
                 android:text="@string/bus_op_name"
                 android:textColor="#3E83EC"
@@ -234,7 +235,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:cardBackgroundColor="@color/blue_tracking_o">
+                app:cardBackgroundColor="@color/blue">
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
@@ -541,7 +542,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:visibility="gone"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

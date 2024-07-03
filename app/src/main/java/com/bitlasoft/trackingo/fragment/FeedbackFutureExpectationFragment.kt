@@ -8,11 +8,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import com.bitlasoft.trackingo.R
 import com.bitlasoft.trackingo.adapter.RatingFeedbackReviewAdapter
 import com.bitlasoft.trackingo.databinding.FeedbackDownRequestLayoutBinding
 import com.bitlasoft.trackingo.domain.pojo.feedback_review.response.RatingFeedbackReviewResponse
-import com.bitlasoft.trackingo.utils.Constants
 import com.bitlasoft.trackingo.utils.FeedbackRatingClickListener
 import com.bitlasoft.trackingo.utils.RetrofitInstanceFeedback
 import com.bitlasoft.trackingo.viewModel.FeedbackViewModel
@@ -30,6 +28,8 @@ class FeedbackFutureExpectationFragment : Fragment(), FeedbackRatingClickListene
     private lateinit var adapter: RatingFeedbackReviewAdapter
     private val viewModel: FeedbackViewModel by viewModel()
     private var apiKey: String? = null
+    var isPnr = false
+    var shortKey = ""
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,6 +38,16 @@ class FeedbackFutureExpectationFragment : Fragment(), FeedbackRatingClickListene
     ): View? {
         _binding = FeedbackDownRequestLayoutBinding.inflate(inflater, container, false)
 //        apiKey = arguments?.getString("key")
+
+        if (arguments!=null && arguments?.containsKey("type")==true ){
+            isPnr = arguments?.getString("type").equals("pnr",false)
+            if (isPnr){
+                // later implementation
+            } else{
+                shortKey = arguments?.getString("shortKey")?:""
+            }
+        }
+
         onClickLClose()
         setupRecyclerView()
         setupSubmitButton()
@@ -46,7 +56,7 @@ class FeedbackFutureExpectationFragment : Fragment(), FeedbackRatingClickListene
 
     private fun onClickLClose() {
         binding.feedbackClose1.setOnClickListener {
-            findNavController().navigate(R.id.action_feedbackFutureExpectationFragment_to_mapTrackingoFragment)
+            findNavController().navigateUp()
         }
     }
 
@@ -82,7 +92,7 @@ class FeedbackFutureExpectationFragment : Fragment(), FeedbackRatingClickListene
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val key = Constants.SHORT_KEY ?: Constants.PNR_NUMBER
+                val key = shortKey
                 key?.let {
                     val response = RetrofitInstanceFeedback.apiInterface.submitRatingFeedback(
                         key = it,

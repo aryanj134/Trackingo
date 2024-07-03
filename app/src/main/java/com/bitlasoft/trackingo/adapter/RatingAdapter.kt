@@ -22,56 +22,96 @@ class RatingAdapter(private val ratingItems: List<RatingItem>, private val click
 
             val selectedDrawable = R.drawable.rated_square_box
             val selectedDrawableLeft = R.drawable.rated_square_left_box
-            val selectedDrawableRight = R.drawable.rated_square_left_box
+            val selectedDrawableRight = R.drawable.rated_square_right_box
 
             val unselectedDrawableLeft = R.drawable.rating_square_left_border
             val unselectedDrawableRight = R.drawable.rating_square_right_border
             val unselectedDrawable = R.drawable.rating_square_box
 
             binding.rating1.apply {
-                setOnClickListener { handleRatingClick(1) }
-                background = if (1 <= item.rating) {
+                setOnClickListener{ handleRatingClick(1) }
+                background = if(item.rating == 1)
                     ContextCompat.getDrawable(context, selectedDrawableLeft)
-                } else {
+                else
                      ContextCompat.getDrawable(context, unselectedDrawableLeft)
-                }
             }
 
             binding.rating2.apply {
-                setOnClickListener { handleRatingClick(2) }
-                background = if (2 <= item.rating) {
+                setOnClickListener{ handleRatingClick(2) }
+                background = if(item.rating == 2)
                     ContextCompat.getDrawable(context, selectedDrawable)
-                } else {
-                   ContextCompat.getDrawable(context, unselectedDrawable)
-                }
+                else
+                    ContextCompat.getDrawable(context, unselectedDrawable)
             }
 
             binding.rating3.apply {
-                setOnClickListener { handleRatingClick(3) }
-                background = if (3 <= item.rating) {
+                setOnClickListener{ handleRatingClick(3) }
+                background = if(item.rating == 3)
                     ContextCompat.getDrawable(context, selectedDrawable)
-                } else {
+                else
                     ContextCompat.getDrawable(context, unselectedDrawable)
-                }
             }
 
             binding.rating4.apply {
-                setOnClickListener { handleRatingClick(4) }
-                background = if (4 <= item.rating) {
+                setOnClickListener{ handleRatingClick(4) }
+                background = if(item.rating == 4)
                     ContextCompat.getDrawable(context, selectedDrawable)
-                } else {
+                else
                     ContextCompat.getDrawable(context, unselectedDrawable)
-                }
             }
 
             binding.rating5.apply {
-                setOnClickListener { handleRatingClick(5) }
-                background = if (5 <= item.rating) {
+                setOnClickListener{ handleRatingClick(5) }
+                background = if(item.rating == 5)
                     ContextCompat.getDrawable(context, selectedDrawableRight)
-                } else {
+                else
                     ContextCompat.getDrawable(context, unselectedDrawableRight)
-                }
             }
+
+//            binding.rating1.apply {
+//                setOnClickListener { handleRatingClick(1) }
+//                background = if (1 <= item.rating) {
+//                    ContextCompat.getDrawable(context, selectedDrawableLeft)
+//                } else {
+//                     ContextCompat.getDrawable(context, unselectedDrawableLeft)
+//                }
+//            }
+//
+//            binding.rating2.apply {
+//                setOnClickListener { handleRatingClick(2) }
+//                background = if (2 <= item.rating) {
+//                    ContextCompat.getDrawable(context, selectedDrawable)
+//                } else {
+//                   ContextCompat.getDrawable(context, unselectedDrawable)
+//                }
+//            }
+//
+//            binding.rating3.apply {
+//                setOnClickListener { handleRatingClick(3) }
+//                background = if (3 <= item.rating) {
+//                    ContextCompat.getDrawable(context, selectedDrawable)
+//                } else {
+//                    ContextCompat.getDrawable(context, unselectedDrawable)
+//                }
+//            }
+//
+//            binding.rating4.apply {
+//                setOnClickListener { handleRatingClick(4) }
+//                background = if (4 <= item.rating) {
+//                    ContextCompat.getDrawable(context, selectedDrawable)
+//                } else {
+//                    ContextCompat.getDrawable(context, unselectedDrawable)
+//                }
+//            }
+//
+//            binding.rating5.apply {
+//                setOnClickListener { handleRatingClick(5) }
+//                background = if (5 <= item.rating) {
+//                    ContextCompat.getDrawable(context, selectedDrawableRight)
+//                } else {
+//                    ContextCompat.getDrawable(context, unselectedDrawableRight)
+//                }
+//            }
         }
 
         private fun handleRatingClick(rating: Int) {

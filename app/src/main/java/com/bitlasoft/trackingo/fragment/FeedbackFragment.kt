@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import com.bitlasoft.trackingo.R
 import com.bitlasoft.trackingo.adapter.RatingAdapter
 import com.bitlasoft.trackingo.databinding.FeedbackUpRequestLayoutBinding
 import com.bitlasoft.trackingo.domain.pojo.feedback_review.response.FeedbackReviewResponse
@@ -74,7 +73,7 @@ class FeedbackFragment : Fragment(), RatingClickListener {
 
     private fun setupClickListeners() {
         binding.feedbackClose.setOnClickListener {
-            findNavController().navigate(R.id.action_feedbackFragment_to_mapTrackingoFragment)
+            findNavController().popBackStack()
         }
 
         binding.feedbackSubmit.setOnClickListener {
