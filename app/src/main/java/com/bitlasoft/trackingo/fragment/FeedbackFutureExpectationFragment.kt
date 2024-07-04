@@ -10,7 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bitlasoft.trackingo.adapter.RatingFeedbackReviewAdapter
 import com.bitlasoft.trackingo.databinding.FeedbackDownRequestLayoutBinding
-import com.bitlasoft.trackingo.domain.pojo.feedback_review.response.RatingFeedbackReviewResponse
+import com.bitlasoft.trackingo.domain.pojo.feedback_review.response.FeedbackType2
 import com.bitlasoft.trackingo.utils.FeedbackRatingClickListener
 import com.bitlasoft.trackingo.utils.RetrofitInstanceFeedback
 import com.bitlasoft.trackingo.viewModel.FeedbackViewModel
@@ -26,8 +26,7 @@ class FeedbackFutureExpectationFragment : Fragment(), FeedbackRatingClickListene
     private val binding get() = _binding!!
 
     private lateinit var adapter: RatingFeedbackReviewAdapter
-    private val viewModel: FeedbackViewModel by viewModel()
-    private var apiKey: String? = null
+    private val feedbackViewModel: FeedbackViewModel by viewModel()
     var isPnr = false
     var shortKey = ""
 
@@ -37,16 +36,8 @@ class FeedbackFutureExpectationFragment : Fragment(), FeedbackRatingClickListene
         savedInstanceState: Bundle?
     ): View? {
         _binding = FeedbackDownRequestLayoutBinding.inflate(inflater, container, false)
-//        apiKey = arguments?.getString("key")
 
-        if (arguments!=null && arguments?.containsKey("type")==true ){
-            isPnr = arguments?.getString("type").equals("pnr",false)
-            if (isPnr){
-                // later implementation
-            } else{
-                shortKey = arguments?.getString("shortKey")?:""
-            }
-        }
+        shortKey = arguments?.getString("shortKey") ?: ""
 
         onClickLClose()
         setupRecyclerView()
@@ -65,11 +56,11 @@ class FeedbackFutureExpectationFragment : Fragment(), FeedbackRatingClickListene
         binding.recycleviewFeedback.adapter = adapter
         binding.recycleviewFeedback.layoutManager = GridLayoutManager(requireContext(), 1)
         //initial rating here
-        adapter.setRating(viewModel.rating.value ?: 0)
+        adapter.setRating(feedbackViewModel.rating.value ?: 0)
     }
 
     override fun onRatingClicked(rating: Int) {
-        viewModel.updateRating(rating)
+        feedbackViewModel.updateRating(rating)
         adapter.setRating(rating)
     }
 
@@ -84,46 +75,31 @@ class FeedbackFutureExpectationFragment : Fragment(), FeedbackRatingClickListene
         val experienceText = binding.feedbackExperienceWrite.text.toString().trim()
         val expectationText = binding.feedbackExpectWrite.text.toString().trim()
 
-        val feedbackReview = RatingFeedbackReviewResponse(
-            ratingsMap,
-            experienceText,
-            expectationText
-        )
+        val feedbackType2 = FeedbackType2(type = 2, ratingsMap["How do you rate Trackingo service?"], experienceText, expectationText)
 
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val key = shortKey
-                key?.let {
-                    val response = RetrofitInstanceFeedback.apiInterface.submitRatingFeedback(
-                        key = it,
-                        ratingFeedback = feedbackReview
-                    )
-                    if (response.isSuccessful) {
-                        requireActivity().runOnUiThread {
-                            Toast.makeText(requireContext(), "Feedback submitted successfully!", Toast.LENGTH_SHORT).show()
-                            findNavController().popBackStack()
-                        }
-                        adapter.clearAllRatings()
-                    } else {
-                        requireActivity().runOnUiThread {
-                            Toast.makeText(requireContext(), "Failed to submit feedback. Please try again later.", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                } ?: run {
-                    requireActivity().runOnUiThread {
-                        Toast.makeText(requireContext(), "API key is missing.", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            } catch (e: HttpException) {
-                requireActivity().runOnUiThread {
-                    Toast.makeText(requireContext(), "Network error. Please check your internet connection.", Toast.LENGTH_SHORT).show()
-                }
-            } catch (e: Exception) {
-                requireActivity().runOnUiThread {
-                    Toast.makeText(requireContext(), "Unexpected error occurred. Please try again later.", Toast.LENGTH_SHORT).show()
-                }
+        feedbackViewModel.submitRatingFeedbackFutureExpectations(shortKey, feedbackType2)
+
+        feedbackViewModel.submitRatingFeedbackFutureExpectations.observe(requireActivity()) {
+            when(it.status) {
+                200 -> Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
+                else -> Toast.makeText(requireContext(), "Failed to submit feedback. Please try again later.", Toast.LENGTH_SHORT).show()
             }
         }
+        findNavController().popBackStack()
+        adapter.clearAllRatings()
+
+//                    } else {
+//                        requireActivity().runOnUiThread {
+//                            Toast.makeText(requireContext(), "Failed to submit feedback. Please try again later.", Toast.LENGTH_SHORT).show()
+//                        }
+//                    }
+//                }
+//            } catch (e: Exception) {
+//                requireActivity().runOnUiThread {
+//                    Toast.makeText(requireContext(), "Unexpected error occurred. Please try again later.", Toast.LENGTH_SHORT).show()
+//                }
+//            }
+//        }
     }
 
     override fun onDestroyView() {

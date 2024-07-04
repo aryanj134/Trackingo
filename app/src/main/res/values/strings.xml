@@ -14,14 +14,11 @@
     <string name="location">Location</string>
     <string name="service_name_eg">KA-7A</string>
     <string name="service">Service:</string>
-    <string name="feedback_text1">We Love to hear any feedback you have about Trackingo.</string>
-    <string name="feedback_text2">If you have any feedback/complaint about Bus Operator. submit it here</string>
+    <string name="feedback_text">We Love to hear any feedback you have about Trackingo.\n\nIf you have any feedback/complaint about Bus Operator. submit it here</string>
     <string name="download_app_text">For Booking, Tracking, Break Stops &amp; Alerts with Exclusive Offers</string>
-    <string name="disclaimer_text1">Disclaimer : TrackingGo provides information about the location,
-        arrival or delay of the bus to its passengers.</string>
-    <string name="disclaimer_text2">These services are merely for knowledge purposes and not for authentic timings.
-        So please rely only on the bus itinerary on your bus ticket.</string>
-    <string name="disclaimer_text3">The bus could be running late or can arrive early due to some unavoidable
+    <string name="disclaimer_text">Disclaimer : TrackingGo provides information about the location,
+        arrival or delay of the bus to its passengers.\n\nThese services are merely for knowledge purposes and not for authentic timings.
+        So please rely only on the bus itinerary on your bus ticket.\n\nThe bus could be running late or can arrive early due to some unavoidable
         circumstances like traffic, or other similar reasons that the time provided by us.</string>
     <string name="download_mobile_app">Download Mobile App</string>
     <string name="aim_of_page">Enter Short Key / PNR Number</string>
@@ -31,11 +28,9 @@
     <string name="example_text">CW5RN6</string>
     <string name="feedback">Feedback Request</string>
     <string name="feedback_close_description">Closing the screen</string>
-    <string name="feedback_thanks">Thanks for choosing us for your travel, we value &amp; respect
-        your feedback for continuous improvement</string>
-    <string name="feedback_rating_description">Rate in the scale of (lowest) 1, 2, 3, 4, 5
-        (highest) </string>
-    <string name="tracking_o_dialog">TrackinGo provides information\nabout the location, arrival or\ndelay of the bus to its\npassengers.\n\nThese services are merely for\nknowledge purposes and not for\nauthentic timings. So please rely\nonly on the bus itinerary on your\nbus ticket.\n\nThe bus could be running late or\ncan arrive early due to some\nunavoidable circumstances like\ntraffic, or other similar reasons\nthan the time provided by us.</string>
+    <string name="feedback_thanks">Thanks for choosing us for your travel, we value &amp; respectyour feedback for continuous improvement</string>
+    <string name="feedback_rating_description">Rate in the scale of (lowest) 1, 2, 3, 4, 5(highest) </string>
+    <string name="tracking_o_dialog">TrackinGo provides information about\nthe location, arrival or delay of the bus\nto its passengers.\n\nThese services are merely for\nknowledge purposes and not for\nauthentic timings. So please rely only\non the bus itinerary on your bus ticket.\n\nThe bus could be running late or can\narrive early due to some unavoidable\ncircumstances like traffic, or other similar\nreasons than the time provided by us.</string>
     <string name="suggestion_feedback">Any Other Suggestions</string>
     <string name="feedback_submit">SUBMIT</string>
     <string name="please_share_your_experience_about_the_real_time_updates_sms_you_received_about_the_location_and_delay_information_of_the_bus">Please Share your experience about the real time updates/SMS you recieved about the location and delay, information of the bus</string>
@@ -51,4 +46,5 @@
     <string name="google_maps_api_key">AIzaSyCLuYsbkS20yk_eFIx1rwPLqPn2S4iF8vQ</string>
     <string name="message">message</string>
     <string name="loading">Loading...</string>
+    <string name="ok">OK</string>
 </resources>

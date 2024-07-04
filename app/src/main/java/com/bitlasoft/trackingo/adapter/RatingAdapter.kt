@@ -13,7 +13,7 @@ class RatingAdapter(private val ratingItems: List<RatingItem>, private val click
     RecyclerView.Adapter<RatingAdapter.ViewHolder>() {
 
     private val ratingMap: MutableMap<String, Int> = mutableMapOf()
-
+    private var selectedRating = 0
     inner class ViewHolder(private val binding: ItemRatingBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
@@ -67,51 +67,6 @@ class RatingAdapter(private val ratingItems: List<RatingItem>, private val click
                 else
                     ContextCompat.getDrawable(context, unselectedDrawableRight)
             }
-
-//            binding.rating1.apply {
-//                setOnClickListener { handleRatingClick(1) }
-//                background = if (1 <= item.rating) {
-//                    ContextCompat.getDrawable(context, selectedDrawableLeft)
-//                } else {
-//                     ContextCompat.getDrawable(context, unselectedDrawableLeft)
-//                }
-//            }
-//
-//            binding.rating2.apply {
-//                setOnClickListener { handleRatingClick(2) }
-//                background = if (2 <= item.rating) {
-//                    ContextCompat.getDrawable(context, selectedDrawable)
-//                } else {
-//                   ContextCompat.getDrawable(context, unselectedDrawable)
-//                }
-//            }
-//
-//            binding.rating3.apply {
-//                setOnClickListener { handleRatingClick(3) }
-//                background = if (3 <= item.rating) {
-//                    ContextCompat.getDrawable(context, selectedDrawable)
-//                } else {
-//                    ContextCompat.getDrawable(context, unselectedDrawable)
-//                }
-//            }
-//
-//            binding.rating4.apply {
-//                setOnClickListener { handleRatingClick(4) }
-//                background = if (4 <= item.rating) {
-//                    ContextCompat.getDrawable(context, selectedDrawable)
-//                } else {
-//                    ContextCompat.getDrawable(context, unselectedDrawable)
-//                }
-//            }
-//
-//            binding.rating5.apply {
-//                setOnClickListener { handleRatingClick(5) }
-//                background = if (5 <= item.rating) {
-//                    ContextCompat.getDrawable(context, selectedDrawableRight)
-//                } else {
-//                    ContextCompat.getDrawable(context, unselectedDrawableRight)
-//                }
-//            }
         }
 
         private fun handleRatingClick(rating: Int) {
@@ -133,6 +88,17 @@ class RatingAdapter(private val ratingItems: List<RatingItem>, private val click
 
     fun getAllRatings(): Map<String, Int> {
         return ratingMap
+    }
+
+    fun clearAllRatings() {
+        selectedRating = 0
+        ratingMap.clear()
+        notifyDataSetChanged()
+    }
+
+    fun setRating(rating: Int) {
+        selectedRating = rating
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int = ratingItems.size

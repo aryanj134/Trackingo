@@ -38,6 +38,7 @@ class BpDpAdapter(private var itemList: List<LocTime>): RecyclerView.Adapter<BpD
             } else{
                 verticalGuideline.visibility = View.GONE
                 smallDividerView.visibility = View.VISIBLE
+                busIcon.visibility = View.GONE
             }
             if (position % 2 == 0) {
                 oddTitleTextView.text = currentItem.title

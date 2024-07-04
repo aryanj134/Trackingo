@@ -67,51 +67,6 @@ class RatingFeedbackReviewAdapter(private val clickListener: FeedbackRatingClick
                 else
                     ContextCompat.getDrawable(context, unselectedDrawableRight)
             }
-
-//            binding.rating1.apply {
-//                setOnClickListener { handleRatingClick(1) }
-//                background = if (1 <= selectedRating) {
-//                    ContextCompat.getDrawable(context, selectedDrawableLeft)
-//                } else {
-//                    ContextCompat.getDrawable(context, unselectedDrawableLeft)
-//                }
-//            }
-//
-//            binding.rating2.apply {
-//                setOnClickListener { handleRatingClick(2) }
-//                background = if (2 <= selectedRating) {
-//                    ContextCompat.getDrawable(context, selectedDrawable)
-//                } else {
-//                    ContextCompat.getDrawable(context, unselectedDrawable)
-//                }
-//            }
-//
-//            binding.rating3.apply {
-//                setOnClickListener { handleRatingClick(3) }
-//                background = if (3 <= selectedRating) {
-//                    ContextCompat.getDrawable(context, selectedDrawable)
-//                } else {
-//                    ContextCompat.getDrawable(context, unselectedDrawable)
-//                }
-//            }
-//
-//            binding.rating4.apply {
-//                setOnClickListener { handleRatingClick(4) }
-//                background = if (4 <= selectedRating) {
-//                    ContextCompat.getDrawable(context, selectedDrawable)
-//                } else {
-//                    ContextCompat.getDrawable(context, unselectedDrawable)
-//                }
-//            }
-//
-//            binding.rating5.apply {
-//                setOnClickListener { handleRatingClick(5) }
-//                background = if (5 <= selectedRating) {
-//                    ContextCompat.getDrawable(context, selectedDrawableRight)
-//                } else {
-//                    ContextCompat.getDrawable(context, unselectedDrawableRight)
-//                }
-//            }
         }
 
         private fun handleRatingClick(rating: Int) {

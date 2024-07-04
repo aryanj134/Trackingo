@@ -1,7 +1,8 @@
 package com.bitlasoft.trackingo.data
 
-import com.bitlasoft.trackingo.domain.pojo.feedback_review.response.FeedbackReviewResponseApi
-import com.bitlasoft.trackingo.domain.pojo.feedback_review.response.RatingFeedbackReviewResponse
+import com.bitlasoft.trackingo.domain.pojo.feedback_review.response.FeedbackResponse
+import com.bitlasoft.trackingo.domain.pojo.feedback_review.response.FeedbackType1
+import com.bitlasoft.trackingo.domain.pojo.feedback_review.response.FeedbackType2
 import com.bitlasoft.trackingo.domain.pojo.location_data.response.Coordinates
 import com.bitlasoft.trackingo.domain.pojo.location_data.response.LocationTimeDetails
 import retrofit2.Response
@@ -12,16 +13,16 @@ import retrofit2.http.Query
 
 interface ApiInterface {
     @POST("api/live/tracking_feedback")
-    suspend fun submitRatingFeedback(
+    suspend fun submitRatingFeedbackFutureExpectations(
         @Query("key") key: String?,
-        @Body ratingFeedback: RatingFeedbackReviewResponse
-    ): Response<Unit>
+        @Body ratingFeedback: FeedbackType2
+    ): Response<FeedbackResponse>
 
     @POST("api/live/tracking_feedback")
-    suspend fun submitFeedback(
+    suspend fun submitRatingsFeedback(
         @Query("key") key: String?,
-        @Body feedback: FeedbackReviewResponseApi
-    ): Response<Unit>
+        @Body feedback: FeedbackType1
+    ): Response<FeedbackResponse>
 
     @GET("api/live/eta_map")
     suspend fun fetchDetails(

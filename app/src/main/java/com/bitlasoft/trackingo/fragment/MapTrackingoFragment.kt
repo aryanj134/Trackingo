@@ -1,5 +1,7 @@
 package com.bitlasoft.trackingo.fragment
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Typeface
@@ -17,7 +19,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -60,7 +64,6 @@ class MapTrackingoFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        //Inflating the layout
         //Setting the recyclerView layout as Horizontal
         val horizontalLayoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
@@ -87,13 +90,13 @@ class MapTrackingoFragment : Fragment() {
         mapView?.getMapAsync { map ->
             googleMap = map
             locTimeViewModel.getLocationTimeDetails(true, shortKey)
-
+            coordinatesViewModel.getCoordinates(shortKey, 12, "mobile")
             googleMap?.uiSettings?.apply {
                 isZoomControlsEnabled = true
                 isCompassEnabled = true
+                isMapToolbarEnabled = true
                 isZoomGesturesEnabled = true
                 isScrollGesturesEnabled = true
-                isMyLocationButtonEnabled = true
             }
         }
 
@@ -142,8 +145,11 @@ class MapTrackingoFragment : Fragment() {
         }
         //Map Zoom In Button
         _binding.zoomInBtn.setOnClickListener {
-            findNavController().navigate(R.id.action_mapTrackingoFragment_to_zoomedMapFragment)
+            findNavController().navigate(R.id.action_mapTrackingoFragment_to_zoomedMapFragment, Bundle().apply {
+                putString("shortKey", shortKey)
+            })
         }
+
     }
 
     //Dialog Box for the first time appearance of Tracking Page
@@ -185,9 +191,8 @@ class MapTrackingoFragment : Fragment() {
 
     private fun textSpan() {
         // Initialize SpannableStringBuilders
-        val spannableStringBuilder1 = SpannableStringBuilder(_binding.feedbackText1.text)
-        val spannableStringBuilder2 = SpannableStringBuilder(_binding.feedbackText2.text)
-        val spannableStringBuilder3 = SpannableStringBuilder(_binding.disclaimerText1.text)
+        val spannableStringBuilder1 = SpannableStringBuilder(_binding.feedbackText.text)
+        val spannableStringBuilder2 = SpannableStringBuilder(_binding.disclaimerText.text)
 
         // Creating spans
         val boldSpan = StyleSpan(Typeface.BOLD)
@@ -196,7 +201,9 @@ class MapTrackingoFragment : Fragment() {
         val clickableSpan1 = object : ClickableSpan() {
             override fun onClick(widget: View) {
                 // Click will redirect to 1st feedback fragment
-                findNavController().navigate(R.id.action_mapTrackingoFragment_to_feedbackFutureExpectationFragment)
+                findNavController().navigate(R.id.action_mapTrackingoFragment_to_feedbackFutureExpectationFragment, Bundle().apply {
+                    putString("shortKey", shortKey)
+                })
             }
 
             override fun updateDrawState(ds: TextPaint) {
@@ -209,7 +216,9 @@ class MapTrackingoFragment : Fragment() {
         val clickableSpan2 = object : ClickableSpan() {
             override fun onClick(widget: View) {
                 // Click will redirect to 2nd feedback fragment
-                findNavController().navigate(R.id.action_mapTrackingoFragment_to_feedbackFragment)
+                findNavController().navigate(R.id.action_mapTrackingoFragment_to_feedbackFragment, Bundle().apply {
+                    putString("shortKey", shortKey)
+                })
             }
 
             override fun updateDrawState(ds: TextPaint) {
@@ -220,39 +229,36 @@ class MapTrackingoFragment : Fragment() {
         }
 
         // Apply spans to feedbackText1
-        _binding.feedbackText1.text.let {
-            val startFeedback1 = it.indexOf("feedback")
-            val endFeedback1 = startFeedback1 + "feedback".length
+        _binding.feedbackText.text.let {
+            val startFeedback = it.indexOf("feedback")
+            val endFeedback = startFeedback + "feedback".length
 
             val startTrackingo = it.indexOf("Trackingo.")
             val endTrackingo = startTrackingo + "Trackingo".length
 
-            spannableStringBuilder1.applySpans(listOf(clickableSpan1), startFeedback1, endFeedback1)
-            spannableStringBuilder1.applySpans(listOf(boldSpan), startTrackingo, endTrackingo)
-        }
-
-        // Apply spans to feedbackText2
-        _binding.feedbackText2.text.let {
             val startHere = it.indexOf("here")
             val endHere = startHere + "here".length
 
             val startBusOperator = it.indexOf("Bus Operator.")
-            val endBusOperator = startBusOperator + "Bus Operator".length
+            val endBusOperator = startBusOperator + "Bus Operator.".length
 
-            spannableStringBuilder2.applySpans(listOf(clickableSpan2), startHere, endHere)
-            spannableStringBuilder2.applySpans(listOf(boldSpan), startBusOperator, endBusOperator)
+            spannableStringBuilder1.applySpans(listOf(clickableSpan1), startFeedback, endFeedback)
+            spannableStringBuilder1.applySpans(listOf(clickableSpan2), startHere, endHere)
+            spannableStringBuilder1.applySpans(listOf(boldSpan), startBusOperator, endBusOperator)
+            spannableStringBuilder1.applySpans(listOf(boldSpan), startTrackingo, endTrackingo)
         }
 
-        spannableStringBuilder3.applySpans(listOf(boldSpan, UnderlineSpan(), sizeSpan), 0, 10)
+        _binding.disclaimerText.text.let {
+            spannableStringBuilder2.applySpans(listOf(boldSpan, UnderlineSpan(), sizeSpan), 0, 10)
+        }
 
         // Assign the spannable text to TextViews
-        _binding.feedbackText1.text = spannableStringBuilder1
-        _binding.feedbackText2.text = spannableStringBuilder2
-        _binding.disclaimerText1.text = spannableStringBuilder3
+        _binding.feedbackText.text = spannableStringBuilder1
+        _binding.disclaimerText.text = spannableStringBuilder2
 
         // Ensure movement method is set
-        _binding.feedbackText1.movementMethod = LinkMovementMethod.getInstance()
-        _binding.feedbackText2.movementMethod = LinkMovementMethod.getInstance()
+        _binding.feedbackText.movementMethod = LinkMovementMethod.getInstance()
+        _binding.disclaimerText.movementMethod = LinkMovementMethod.getInstance()
     }
 
     private fun resizeCustomMarker(drawableRes: Int, width: Int, height: Int): Bitmap {
@@ -276,8 +282,6 @@ class MapTrackingoFragment : Fragment() {
             when (response?.status) {
                 200 -> {
                     _binding.loadingBar.mainProgressBarLayout.visibility = View.GONE
-                    coordinatesViewModel.getCoordinates(shortKey, 12, "mobile")
-
                     Log.d("tag", "Fetching data of location and time")
                     _binding.scrollView.visibility = View.VISIBLE
                     val adapter = BpDpAdapter(emptyList())
@@ -317,6 +321,38 @@ class MapTrackingoFragment : Fragment() {
                                 ), 14f
                             )
                         )
+                    }
+
+                    _binding.locationBtn.setOnClickListener {
+                        response.currentCoordinates?.currentLoc?.let {
+                            val markerOptions = MarkerOptions()
+                                .position(
+                                    com.google.android.gms.maps.model.LatLng(
+                                        it[0]!!,
+                                        it[1]!!
+                                    )
+                                )
+                                .title("speed: $speed\n km/hr \n Time: $dateTime")
+                                .snippet("")
+                                .icon(
+                                    BitmapDescriptorFactory.fromBitmap(
+                                        resizeCustomMarker(
+                                            R.drawable.bus,
+                                            80,
+                                            100
+                                        )
+                                    )
+                                )
+                            googleMap?.addMarker(markerOptions)
+                            googleMap?.moveCamera(
+                                CameraUpdateFactory.newLatLngZoom(
+                                    com.google.android.gms.maps.model.LatLng(
+                                        it[0]!!,
+                                        it[1]!!
+                                    ), 14f
+                                )
+                            )
+                        }
                     }
 
                     for (i in response.locationTimeDetails.indices) {
@@ -409,7 +445,7 @@ class MapTrackingoFragment : Fragment() {
                                                 )
                                             )
                                             .title(latLng.servicePlace)
-                                            .snippet("Scheduled Time:\n${scheduledTime[i]}")
+//                                            .snippet("Scheduled Time:\n${scheduledTime[i]}")
                                             .icon(
                                                 BitmapDescriptorFactory.fromBitmap(
                                                     resizeCustomMarker(R.drawable.pick, 60, 60)
@@ -428,7 +464,7 @@ class MapTrackingoFragment : Fragment() {
                                                 )
                                             )
                                             .title(latLng.servicePlace)
-                                            .snippet("Scheduled Time:\n${scheduledTime[i]}")
+//                                            .snippet("Scheduled Time:\n${scheduledTime[i]}")
                                             .icon(
                                                 BitmapDescriptorFactory.fromBitmap(
                                                     resizeCustomMarker(R.drawable.drop, 60, 60)

@@ -9,5 +9,5 @@ import org.koin.dsl.module
 val viewModule = module {
         viewModel { LocationTimeViewModel(get()) }
         viewModel { CoordinatesViewModel(get()) }
-        viewModel { FeedbackViewModel() }
+        viewModel { FeedbackViewModel(get()) }
 }

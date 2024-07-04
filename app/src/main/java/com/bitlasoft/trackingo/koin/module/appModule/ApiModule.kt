@@ -7,8 +7,6 @@ import retrofit2.Retrofit
 
 val ApiModule = module {
     single { provideApiInterface(get()) }
-    single(named("feedbackApi")) { provideApiInterface(get(named("feedback"))) }
-    single(named("feedbackRatingApi")) { provideApiInterface(get(named("feedbackRating"))) }
 }
 
 fun provideApiInterface(retrofit: Retrofit): ApiInterface {

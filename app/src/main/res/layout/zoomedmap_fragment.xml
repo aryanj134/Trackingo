@@ -27,4 +27,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:src="@drawable/exit_full_screen"/>
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/locationBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:clickable="true"
+        android:elevation="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:src="@drawable/bus_marker"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -30,7 +30,7 @@ class ShortKeyFragment : Fragment() {
 
     private fun setupButtonClick() {
         _binding!!.buttonPnrNumber.setOnClickListener {
-            val input = _binding!!.domainEditText.text.toString()
+            val input = _binding!!.domainEditText.text.toString().trim()
             if (input.isEmpty()) {
                 showToast("Enter short key/PNR")
                 return@setOnClickListener
@@ -38,13 +38,13 @@ class ShortKeyFragment : Fragment() {
             when(input.length) {
                 6 -> {
                     findNavController().navigate(R.id.action_shortKeyFragment_to_secondFragment, Bundle().apply {
-                        putString("shortKey", input.trim())
+                        putString("shortKey", input)
                         putString("type", "shortKey")
                     })
                 }
                 10 -> {
                     findNavController().navigate(R.id.action_shortKeyFragment_to_secondFragment, Bundle().apply {
-                        putString("PnrNumber", input.trim())
+                        putString("PnrNumber", input)
                         putString("type", "pnr")
                     })
                 }
