@@ -27,7 +27,13 @@ data class ServiceDetails(
     val srcTime : String?,
 
     @SerializedName("boarding_at")
-    val srcName : String?
+    val srcName : String?,
+
+    @SerializedName("lat_long")
+    val boardingCoordinates: List<Double>?,
+
+    @SerializedName("dropoff_lat_long")
+    val dropoffCoordinates: List<Double>?,
 )
 
 data class Details(

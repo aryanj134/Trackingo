@@ -33,13 +33,19 @@ class BpDpAdapter(private var itemList: List<LocTime>): RecyclerView.Adapter<BpD
 
         holder.apply {
 
-            if(position == 0) {
+            if(adapterPosition == 0) {
+                currentItem.isBusIconVisible = true
                 smallDividerView.visibility = View.INVISIBLE
             } else{
+                currentItem.isBusIconVisible = false
                 verticalGuideline.visibility = View.GONE
                 smallDividerView.visibility = View.VISIBLE
-                busIcon.visibility = View.GONE
             }
+            if(currentItem.isBusIconVisible == true)
+                busIcon.visibility = View.VISIBLE
+            else
+                busIcon.visibility = View.GONE
+
             if (position % 2 == 0) {
                 oddTitleTextView.text = currentItem.title
                 oddSubtitleTextView.text = "Scheduled at " + currentItem.scheduledTime

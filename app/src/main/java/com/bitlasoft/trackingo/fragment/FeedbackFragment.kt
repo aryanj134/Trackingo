@@ -49,6 +49,7 @@ class FeedbackFragment : Fragment(), RatingClickListener {
         shortKey = arguments?.getString("shortKey") ?: ""
 
         setupRecyclerView()
+        setupObserver()
         setupClickListeners()
         observeViewModel()
     }
@@ -58,6 +59,20 @@ class FeedbackFragment : Fragment(), RatingClickListener {
         adapter = RatingAdapter(ratingItems, this)
         binding.recycleFeedbackRating.adapter = adapter
         binding.recycleFeedbackRating.layoutManager = GridLayoutManager(requireContext(), 1)
+    }
+
+    private fun showToast(message: String?) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+    private fun setupObserver() {
+        feedbackViewModel.submitRatingsFeedback.observe(requireActivity()) {
+            when(it.status) {
+                200 -> showToast(it.message)
+                else -> showToast("Failed to submit feedback. Please try again later.")
+            }
+            findNavController().popBackStack()
+            adapter.clearAllRatings()
+        }
     }
 
     override fun onDestroyView() {
@@ -83,11 +98,6 @@ class FeedbackFragment : Fragment(), RatingClickListener {
 
         binding.feedbackSubmit.setOnClickListener {
             submitFeedback()
-            feedbackViewModel.submitRatingsFeedback.observe(viewLifecycleOwner) {
-                Toast.makeText(requireContext(), "Feedback submitted successfully!", Toast.LENGTH_SHORT).show()
-                findNavController().popBackStack()
-                adapter.clearAllRatings()
-            }
         }
     }
 
@@ -100,22 +110,22 @@ class FeedbackFragment : Fragment(), RatingClickListener {
     private fun submitFeedback() {
         val ratingsMap = adapter.getAllRatings()
         val suggestion = binding.feedbackWriteSuggestion.text.toString().trim()
+        val rating1 = ratingsMap["Pickup Experience"]
+        val rating2 = ratingsMap["Bus Quality"]
+        val rating3 = ratingsMap["Staff behaviour"]
+        val rating4 = ratingsMap["Amenities (as promised)"]
+        val rating5 = ratingsMap["Dropping Experience"]
+        val rating6 = ratingsMap["How likely you Recommend our Service?"]
 
-        val feedbackType1 = FeedbackType1(type = 2, ratingsMap["Pickup Experience"], ratingsMap["Bus Quality"],
-            ratingsMap["Staff behaviour"], ratingsMap["Amenities (as promised)"], ratingsMap["Dropping Experience"],
-            ratingsMap["How likely you Recommend our Service?"], suggestion = suggestion)
+        val feedbackType1 = FeedbackType1(type = 2, rating1, rating2, rating3, rating4, rating5, rating6, suggestion = suggestion)
 
-        feedbackViewModel.submitRatingsFeedback(shortKey, feedbackType1)
-
-        feedbackViewModel.submitRatingsFeedback.observe(requireActivity()) {
-            when(it.status) {
-                200 -> Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
-                else -> Toast.makeText(requireContext(), "Failed to submit feedback. Please try again later.", Toast.LENGTH_SHORT).show()
-            }
+        if(feedbackType1.amenities != null && feedbackType1.bus_quality != null && feedbackType1.drop_exp != null &&
+            feedbackType1.pickup_exp != null && feedbackType1.recommend != null && feedbackType1.staff_behavior != null && feedbackType1.suggestion != "") {
+            feedbackViewModel.submitRatingsFeedback(shortKey, feedbackType1)
+        }else {
+            showToast("Please enter details")
         }
 
-        findNavController().popBackStack()
-        adapter.clearAllRatings()
     }
 
 }

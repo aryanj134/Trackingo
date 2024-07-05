@@ -52,5 +52,7 @@ data class LocTime (
     val arrivalTime: String?,
 
     @SerializedName("departure_time")
-    val deptTime: String?
+    val deptTime: String?,
+
+    var isBusIconVisible: Boolean? = false
 )

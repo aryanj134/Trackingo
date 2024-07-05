@@ -39,10 +39,26 @@ class FeedbackFutureExpectationFragment : Fragment(), FeedbackRatingClickListene
 
         shortKey = arguments?.getString("shortKey") ?: ""
 
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         onClickLClose()
         setupRecyclerView()
+        setupObserver()
         setupSubmitButton()
-        return binding.root
+    }
+
+    private fun setupObserver() {
+        feedbackViewModel.submitRatingFeedbackFutureExpectations.observe(requireActivity()) {
+            when(it.status) {
+                200 -> Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
+                else -> Toast.makeText(requireContext(), "Failed to submit feedback. Please try again later.", Toast.LENGTH_SHORT).show()
+            }
+            findNavController().popBackStack()
+            adapter.clearAllRatings()
+        }
     }
 
     private fun onClickLClose() {
@@ -64,6 +80,10 @@ class FeedbackFutureExpectationFragment : Fragment(), FeedbackRatingClickListene
         adapter.setRating(rating)
     }
 
+    private fun showToast(message: String?) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
     private fun setupSubmitButton() {
         binding.feedbackSubmit.setOnClickListener {
             submitFeedback()
@@ -74,32 +94,14 @@ class FeedbackFutureExpectationFragment : Fragment(), FeedbackRatingClickListene
         val ratingsMap = adapter.getAllRatings()
         val experienceText = binding.feedbackExperienceWrite.text.toString().trim()
         val expectationText = binding.feedbackExpectWrite.text.toString().trim()
+        val rating = ratingsMap["How do you rate Trackingo service?"]
 
-        val feedbackType2 = FeedbackType2(type = 2, ratingsMap["How do you rate Trackingo service?"], experienceText, expectationText)
+        val feedbackType2 = FeedbackType2(type = 2, rating, experienceText, expectationText)
 
-        feedbackViewModel.submitRatingFeedbackFutureExpectations(shortKey, feedbackType2)
-
-        feedbackViewModel.submitRatingFeedbackFutureExpectations.observe(requireActivity()) {
-            when(it.status) {
-                200 -> Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
-                else -> Toast.makeText(requireContext(), "Failed to submit feedback. Please try again later.", Toast.LENGTH_SHORT).show()
-            }
-        }
-        findNavController().popBackStack()
-        adapter.clearAllRatings()
-
-//                    } else {
-//                        requireActivity().runOnUiThread {
-//                            Toast.makeText(requireContext(), "Failed to submit feedback. Please try again later.", Toast.LENGTH_SHORT).show()
-//                        }
-//                    }
-//                }
-//            } catch (e: Exception) {
-//                requireActivity().runOnUiThread {
-//                    Toast.makeText(requireContext(), "Unexpected error occurred. Please try again later.", Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//        }
+        if(feedbackType2.rating!= null && feedbackType2.expectationText != "" && feedbackType2.experienceText != "")
+            feedbackViewModel.submitRatingFeedbackFutureExpectations(shortKey, feedbackType2)
+        else
+            showToast("Please enter details")
     }
 
     override fun onDestroyView() {

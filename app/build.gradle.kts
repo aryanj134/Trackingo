@@ -74,6 +74,9 @@ dependencies {
     implementation ("com.squareup.okhttp3:okhttp:$logging_version")
     implementation ("com.squareup.okhttp3:logging-interceptor:$logging_version")
 
+    //Balloon
+    implementation ("com.github.skydoves:balloon:1.5.2")
+
     // Navigation Component
     implementation("androidx.navigation:navigation-fragment-ktx:$nav_version")
     implementation("androidx.navigation:navigation-ui-ktx:$nav_version")

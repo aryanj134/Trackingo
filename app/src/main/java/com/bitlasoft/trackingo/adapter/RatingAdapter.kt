@@ -29,7 +29,7 @@ class RatingAdapter(private val ratingItems: List<RatingItem>, private val click
             val unselectedDrawable = R.drawable.rating_square_box
 
             binding.rating1.apply {
-                setOnClickListener{ handleRatingClick(1) }
+                setOnClickListener{ handleRatingClick(1, item.title) }
                 background = if(item.rating == 1)
                     ContextCompat.getDrawable(context, selectedDrawableLeft)
                 else
@@ -37,7 +37,7 @@ class RatingAdapter(private val ratingItems: List<RatingItem>, private val click
             }
 
             binding.rating2.apply {
-                setOnClickListener{ handleRatingClick(2) }
+                setOnClickListener{ handleRatingClick(2, item.title) }
                 background = if(item.rating == 2)
                     ContextCompat.getDrawable(context, selectedDrawable)
                 else
@@ -45,7 +45,7 @@ class RatingAdapter(private val ratingItems: List<RatingItem>, private val click
             }
 
             binding.rating3.apply {
-                setOnClickListener{ handleRatingClick(3) }
+                setOnClickListener{ handleRatingClick(3, item.title) }
                 background = if(item.rating == 3)
                     ContextCompat.getDrawable(context, selectedDrawable)
                 else
@@ -53,7 +53,7 @@ class RatingAdapter(private val ratingItems: List<RatingItem>, private val click
             }
 
             binding.rating4.apply {
-                setOnClickListener{ handleRatingClick(4) }
+                setOnClickListener{ handleRatingClick(4, item.title) }
                 background = if(item.rating == 4)
                     ContextCompat.getDrawable(context, selectedDrawable)
                 else
@@ -61,7 +61,7 @@ class RatingAdapter(private val ratingItems: List<RatingItem>, private val click
             }
 
             binding.rating5.apply {
-                setOnClickListener{ handleRatingClick(5) }
+                setOnClickListener{ handleRatingClick(5, item.title) }
                 background = if(item.rating == 5)
                     ContextCompat.getDrawable(context, selectedDrawableRight)
                 else
@@ -69,9 +69,10 @@ class RatingAdapter(private val ratingItems: List<RatingItem>, private val click
             }
         }
 
-        private fun handleRatingClick(rating: Int) {
+        private fun handleRatingClick(rating: Int, title: String?) {
             val item = ratingItems[adapterPosition]
             item.rating = rating
+            title?.let { ratingMap[it] = rating }
             notifyItemChanged(adapterPosition)
             clickListener.onRatingClicked(rating, adapterPosition)
         }
@@ -91,15 +92,9 @@ class RatingAdapter(private val ratingItems: List<RatingItem>, private val click
     }
 
     fun clearAllRatings() {
-        selectedRating = 0
         ratingMap.clear()
+        ratingItems.forEach { it.rating = 0 }
         notifyDataSetChanged()
     }
-
-    fun setRating(rating: Int) {
-        selectedRating = rating
-        notifyDataSetChanged()
-    }
-
     override fun getItemCount(): Int = ratingItems.size
 }

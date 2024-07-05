@@ -41,5 +41,5 @@ interface ApiInterface {
     suspend fun panicResponse(
         @Query("short_code") short_key: String?,
         @Query("from_webApp") webApp: Boolean?
-    )
+    ) : Response<FeedbackResponse>
 }

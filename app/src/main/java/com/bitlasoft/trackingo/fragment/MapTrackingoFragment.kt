@@ -1,10 +1,10 @@
 package com.bitlasoft.trackingo.fragment
 
-import android.Manifest
-import android.content.pm.PackageManager
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Typeface
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.text.SpannableStringBuilder
@@ -21,7 +21,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -36,6 +35,7 @@ import com.bitlasoft.trackingo.databinding.TrankingoDialogPnrBinding
 import com.bitlasoft.trackingo.utils.isInternetAvailable
 import com.bitlasoft.trackingo.viewModel.CoordinatesViewModel
 import com.bitlasoft.trackingo.viewModel.LocationTimeViewModel
+import com.bitlasoft.trackingo.viewModel.PanicViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
@@ -46,13 +46,11 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MapTrackingoFragment : Fragment() {
 
-
     private val _binding by lazy { MaptrackingoFragmentBinding.inflate(layoutInflater) }
-
-    //    private val binding get() = _binding!!
     private lateinit var itemLayoutBinding: ItemLayoutBinding
     private val locTimeViewModel: LocationTimeViewModel by viewModel()
     private val coordinatesViewModel: CoordinatesViewModel by viewModel()
+    private val panicViewModel: PanicViewModel by viewModel()
     private var googleMap: GoogleMap? = null
     private var mapView: MapView? = null
     private var isDialogShown = true
@@ -65,10 +63,10 @@ class MapTrackingoFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         //Setting the recyclerView layout as Horizontal
-        val horizontalLayoutManager =
-            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        val horizontalLayoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         _binding.recyclerView.layoutManager = horizontalLayoutManager
 
+        //Internet Connectivity
         observer()
 
         return _binding.root
@@ -99,7 +97,6 @@ class MapTrackingoFragment : Fragment() {
                 isScrollGesturesEnabled = true
             }
         }
-
         // Back Button to ShortKeyFragment
         _binding.backBtn.setOnClickListener {
             findNavController().popBackStack()
@@ -123,14 +120,12 @@ class MapTrackingoFragment : Fragment() {
         lifecycleScope.launch {
             if (!isInternetAvailable(requireContext())){
                 _binding.loadingBar.mainProgressBarLayout.visibility = View.GONE
-
                 showMessage("Something is Technically Wrong, We are going to fix it up and things will be normal soon.")
             }
             MainActivity.isInternet.collect {
                 if (it) {
                     _binding.responseMessage.visibility = View.GONE
                     locTimeViewModel.getLocationTimeDetails(true, shortKey)
-
                 } else {
                     showMessage("Something is Technically Wrong, We are going to fix it up and things will be normal soon.")
                 }
@@ -139,7 +134,7 @@ class MapTrackingoFragment : Fragment() {
     }
 
     private fun setUpButtonClick() {
-        //Panic Button
+        // Panic Button
         _binding.panicBtn.setOnClickListener {
             showPanicDialog()
         }
@@ -148,6 +143,10 @@ class MapTrackingoFragment : Fragment() {
             findNavController().navigate(R.id.action_mapTrackingoFragment_to_zoomedMapFragment, Bundle().apply {
                 putString("shortKey", shortKey)
             })
+        }
+        //Download App Button
+        _binding.downloadBtns.setOnClickListener {
+            showToast("App not available for this operator")
         }
 
     }
@@ -173,13 +172,27 @@ class MapTrackingoFragment : Fragment() {
 
         alertDialogBuilder.setPositiveButton("Yes") { dialog, _ ->
             // Handle the positive button click
-            dialog.dismiss()
+            panicViewModel.getPanicResponse("abcd", true)
+            setUpPanicObserver()
         }
         alertDialogBuilder.setNegativeButton("Cancel") { dialog, _ ->
             // Handle the negative button click
             dialog.dismiss()
         }
         alertDialogBuilder.create().show()
+    }
+
+    private fun showToast(message: String?) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun setUpPanicObserver() {
+        panicViewModel.panicResponse.observe(requireActivity()) { response ->
+            when(response.status) {
+                200 -> showToast(response.message)
+                else -> showToast(response.message)
+            }
+        }
     }
 
     // Extension function to apply spans
@@ -220,7 +233,6 @@ class MapTrackingoFragment : Fragment() {
                     putString("shortKey", shortKey)
                 })
             }
-
             override fun updateDrawState(ds: TextPaint) {
                 super.updateDrawState(ds)
                 ds.color = ContextCompat.getColor(context!!, R.color.blue) // Change the link color
@@ -239,19 +251,22 @@ class MapTrackingoFragment : Fragment() {
             val startHere = it.indexOf("here")
             val endHere = startHere + "here".length
 
-            val startBusOperator = it.indexOf("Bus Operator.")
-            val endBusOperator = startBusOperator + "Bus Operator.".length
+            val startBus = it.indexOf("Bus")
+            val endBus = startBus + "Bus".length
+
+            val startOperator = it.indexOf("Operator.")
+            val endOperator = startOperator + "Operator.".length
 
             spannableStringBuilder1.applySpans(listOf(clickableSpan1), startFeedback, endFeedback)
             spannableStringBuilder1.applySpans(listOf(clickableSpan2), startHere, endHere)
-            spannableStringBuilder1.applySpans(listOf(boldSpan), startBusOperator, endBusOperator)
+            spannableStringBuilder1.applySpans(listOf(boldSpan), startBus, endBus)
+            spannableStringBuilder1.applySpans(listOf(boldSpan), startOperator, endOperator)
             spannableStringBuilder1.applySpans(listOf(boldSpan), startTrackingo, endTrackingo)
         }
 
         _binding.disclaimerText.text.let {
             spannableStringBuilder2.applySpans(listOf(boldSpan, UnderlineSpan(), sizeSpan), 0, 10)
         }
-
         // Assign the spannable text to TextViews
         _binding.feedbackText.text = spannableStringBuilder1
         _binding.disclaimerText.text = spannableStringBuilder2
@@ -262,16 +277,10 @@ class MapTrackingoFragment : Fragment() {
     }
 
     private fun resizeCustomMarker(drawableRes: Int, width: Int, height: Int): Bitmap {
-        return Bitmap.createScaledBitmap(
-            BitmapFactory.decodeResource(resources, drawableRes),
-            width,
-            height,
-            false
-        )
+        return Bitmap.createScaledBitmap(BitmapFactory.decodeResource(resources, drawableRes), width, height, false)
     }
 
     private fun setUpObserver() {
-
         val arrivalTime: MutableList<String?> = mutableListOf()
         val deptTime: MutableList<String?> = mutableListOf()
         val scheduledTime: MutableList<String?> = mutableListOf()
@@ -286,6 +295,7 @@ class MapTrackingoFragment : Fragment() {
                     _binding.scrollView.visibility = View.VISIBLE
                     val adapter = BpDpAdapter(emptyList())
                     _binding.recyclerView.adapter = adapter
+
                     response.locationTimeDetails?.let { adapter.updateData(it) }
                     for (i in response.locationTimeDetails?.indices!!) {
                         arrivalTime.add(response.locationTimeDetails[i].arrivalTime)
@@ -307,8 +317,8 @@ class MapTrackingoFragment : Fragment() {
                                 BitmapDescriptorFactory.fromBitmap(
                                     resizeCustomMarker(
                                         R.drawable.bus,
-                                        80,
-                                        100
+                                        100,
+                                        120
                                     )
                                 )
                             )
@@ -338,8 +348,8 @@ class MapTrackingoFragment : Fragment() {
                                     BitmapDescriptorFactory.fromBitmap(
                                         resizeCustomMarker(
                                             R.drawable.bus,
-                                            80,
-                                            100
+                                            100,
+                                            120
                                         )
                                     )
                                 )
@@ -354,43 +364,28 @@ class MapTrackingoFragment : Fragment() {
                             )
                         }
                     }
-
                     for (i in response.locationTimeDetails.indices) {
-                        if (response.curr_sp_id == response.locationTimeDetails[i].id) {
-                            if (adapter.itemCount > 0) {
-                                val itemView =
-                                    _binding.recyclerView.findViewHolderForAdapterPosition(i)?.itemView
-                                if (itemView != null) {
-                                    itemLayoutBinding = ItemLayoutBinding.bind(itemView)
-                                    itemLayoutBinding.busTracker.visibility = View.VISIBLE
-                                    if (response.is_passed == false)
-                                        itemLayoutBinding.busTracker.translationX =
-                                            itemLayoutBinding.trackingDividerMain.width * 0.15f
-                                    else
-                                        itemLayoutBinding.circleView.translationX =
-                                            itemLayoutBinding.circleView.width * 0.5f
-                                }
+                        val itemView = _binding.recyclerView.findViewHolderForAdapterPosition(i)?.itemView
+                        if (itemView != null) {
+                            itemLayoutBinding = ItemLayoutBinding.bind(itemView)
+                            if (response.curr_sp_id == response.locationTimeDetails[i].id) {
+                                itemLayoutBinding.busTracker.visibility = View.VISIBLE
+                                if (response.is_passed == false)
+                                    itemLayoutBinding.busTracker.translationX = itemLayoutBinding.trackingDividerMain.width * 0.15f
+                                else
+                                    itemLayoutBinding.circleView.translationX = itemLayoutBinding.circleView.width * 0.5f
+                            } else {
+                            itemLayoutBinding.busTracker.visibility = View.INVISIBLE
                             }
-                        } else {
-                            if (adapter.itemCount > 0) {
-                                val itemView =
-                                    _binding.recyclerView.findViewHolderForAdapterPosition(i)?.itemView
-                                if (itemView != null) {
-                                    itemLayoutBinding = ItemLayoutBinding.bind(itemView)
-                                    itemLayoutBinding.busTracker.visibility = View.INVISIBLE
-                                }
-                            }
-                        }
-
-                        if (response.locationTimeDetails[i].skippedStatus == true) {
-                            if (adapter.itemCount > 0) {
-                                val itemView =
+                            if (response.locationTimeDetails[i].skippedStatus == true) {
+                                val firstItemView =
                                     _binding.recyclerView.findViewHolderForAdapterPosition(0)?.itemView
-                                if (itemView != null) {
-                                    itemLayoutBinding = ItemLayoutBinding.bind(itemView)
+                                if (firstItemView != null) {
+                                    itemLayoutBinding = ItemLayoutBinding.bind(firstItemView)
                                     itemLayoutBinding.busTracker.visibility = View.VISIBLE
                                     itemLayoutBinding.busTracker.translationX =
                                         itemLayoutBinding.trackingDividerMain.width * 0.5f
+                                    itemLayoutBinding.busTracker.animate().translationX(itemLayoutBinding.trackingDividerMain.width * 0.5f).setDuration(1000).start()
                                     itemLayoutBinding.circleView.background =
                                         ContextCompat.getDrawable(requireContext(), R.color.red)
                                 }
@@ -398,11 +393,9 @@ class MapTrackingoFragment : Fragment() {
                         }
                     }
                 }
-
                 302, 500 -> {
                     Log.d("tag", "Message received")
                 }
-
                 else -> {
                     Log.e("tag", "Error")
                 }
@@ -416,12 +409,10 @@ class MapTrackingoFragment : Fragment() {
                         _binding.loadingBar.mainProgressBarLayout.visibility = View.GONE
                         Log.d("tag", "Fetching data of coordinates")
                         _binding.scrollView.visibility = View.VISIBLE
-
                         if (response.bustracking?.isNotEmpty() == true) {
                             speed = response.bustracking[0]?.details?.speed!!
                             dateTime = response.bustracking[0]?.details?.dateTime!!
                         }
-
                         response.journeyDetails?.let {
                             _binding.apply {
                                 serviceName.text = it.serviceNum
@@ -429,6 +420,20 @@ class MapTrackingoFragment : Fragment() {
                                 copyLocation.text = it.srcAddress
                                 busNumber.text = it.vehicleNum
                                 busTime.text = it.srcTime
+
+                                val srcLat = it.boardingCoordinates!![0]
+                                val srcLng = it.boardingCoordinates[1]
+                                val destLat = it.dropoffCoordinates!![0]
+                                val destLng = it.dropoffCoordinates[1]
+
+                                // Boarding directions Button
+                                boardingBtn.setOnClickListener {
+                                    showDirectionsToLocation(srcLat, srcLng)
+                                }
+                                // Share dropoff button
+                                dropoffBtn.setOnClickListener {
+                                    shareDropOffLocation(destLat, destLng)
+                                }
                             }
                         }
 
@@ -479,17 +484,32 @@ class MapTrackingoFragment : Fragment() {
                         if (isDialogShown)
                             showDialog()
                     }
-
                     302, 500 -> {
                         Log.d("tag", "Message received")
                         showMessage(response.message)
                     }
-
                     else -> {
                         Log.e("tag", "Error")
                     }
                 }
             }
+        }
+    }
+
+    private fun shareDropOffLocation(lat: Double?, lng: Double?) {
+        val uri = "https://www.google.com/maps/dir/?api=1&origin=&destination=${lat},${lng}"
+        val sharingIntent = Intent(Intent.ACTION_SEND)
+        sharingIntent.type = "text/plain"
+        sharingIntent.putExtra(Intent.EXTRA_TEXT,getString(R.string.share_bus_location_text)+" "+ uri)
+        startActivity(Intent.createChooser(sharingIntent, "Share in..."))
+    }
+
+    private fun showDirectionsToLocation(lat: Double?, lng: Double?) {
+        val gmmIntentUri = Uri.parse("https://www.google.com/maps/dir/?api=1&origin=&destination=$lat,$lng")
+        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+        mapIntent.setPackage("com.google.android.apps.maps")
+        if (mapIntent.resolveActivity(requireActivity().packageManager) != null) {
+            startActivity(mapIntent)
         }
     }
 
@@ -508,5 +528,4 @@ class MapTrackingoFragment : Fragment() {
         super.onDestroyView()
         mapView?.onDestroy()
     }
-
 }

@@ -12,7 +12,7 @@
             android:id="@+id/dialogMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:lineSpacingExtra="4dp"
+            android:lineSpacingExtra="3dp"
             android:paddingTop="34dp"
             android:text="@string/tracking_o_dialog"
             android:textAlignment="gravity"

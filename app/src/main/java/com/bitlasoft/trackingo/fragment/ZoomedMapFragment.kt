@@ -92,8 +92,8 @@ class ZoomedMapFragment: Fragment() {
                             BitmapDescriptorFactory.fromBitmap(
                                 resizeCustomMarker(
                                     R.drawable.bus,
-                                    80,
-                                    100
+                                    100,
+                                    120
                                 )
                             )
                         )

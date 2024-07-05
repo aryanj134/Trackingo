@@ -140,7 +140,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 android:layout_marginTop="8dp"
                 android:layout_marginStart="4dp"
-                android:textSize="14sp"
+                android:textSize="15sp"
                 app:layout_constraintTop_toBottomOf="@+id/tagline"
                 android:text="@string/service" />
 
@@ -149,8 +149,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:layout_marginStart="5dp"
-                android:textSize="14sp"
+                android:layout_marginStart="3dp"
+                android:textSize="15sp"
                 app:layout_constraintTop_toBottomOf="@id/tagline"
                 app:layout_constraintStart_toEndOf="@id/fixed_text"
                 android:hint="@string/service_name_eg" />
@@ -160,7 +160,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textSize="14sp"
+                android:textSize="15sp"
                 app:layout_constraintTop_toBottomOf="@id/fixed_text"
                 app:layout_constraintStart_toStartOf="parent"
                 android:drawableStart="@drawable/location"
@@ -174,7 +174,7 @@
                 app:layout_constraintTop_toBottomOf="@id/location"
                 app:layout_constraintStart_toStartOf="parent"
                 android:layout_marginStart="4dp"
-                android:textSize="10sp"
+                android:textSize="11sp"
                 android:hint="@string/location" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -185,7 +185,7 @@
                 app:layout_constraintTop_toBottomOf="@id/copy_location"
                 app:layout_constraintStart_toStartOf="parent"
                 android:drawableStart="@drawable/baseline_directions_bus_24"
-                android:textSize="14sp"
+                android:textSize="15sp"
                 android:hint="@string/bus_number" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -197,7 +197,7 @@
                 app:layout_constraintTop_toBottomOf="@id/copy_location"
                 app:layout_constraintStart_toEndOf="@+id/bus_number"
                 android:layout_marginStart="5dp"
-                android:textSize="14sp"
+                android:textSize="15sp"
                 android:hint="@string/time" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -288,6 +288,7 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/dropoffBtn"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -408,27 +409,29 @@
                 app:layout_constraintTop_toBottomOf="@id/download_text"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:weightSum="5">
+                android:weightSum="7">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="@color/golden"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="2dp"
                     android:padding="5dp"
                     app:srcCompat="@drawable/android_24"/>
 
-                <androidx.appcompat.widget.AppCompatButton
+                <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:background="@color/golden"
                     android:text="@string/download_app_text"
                     android:textColor="@color/white"
-                    android:textSize="11sp"
+                    android:textAlignment="center"
+                    android:textSize="12sp"
+                    android:padding="8dp"
                     android:textAllCaps="false"
-                    android:layout_weight="3"/>
+                    android:layout_weight="5"/>
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="0dp"
@@ -436,8 +439,8 @@
                     android:background="@color/golden"
                     android:src="@drawable/download_24"
                     android:padding="5dp"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginEnd="5dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginEnd="4dp"
                     android:layout_weight="1"/>
 
             </androidx.appcompat.widget.LinearLayoutCompat>

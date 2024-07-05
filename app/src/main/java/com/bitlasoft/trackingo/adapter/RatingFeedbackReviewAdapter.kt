@@ -14,11 +14,14 @@ class RatingFeedbackReviewAdapter(private val clickListener: FeedbackRatingClick
     private var selectedRating = 0
     private var ratingMap: MutableMap<String, Int> = mutableMapOf()
 
+    companion object {
+        const val RATING_KEY = "How do you rate Trackingo service?"
+    }
     inner class ViewHolder(private val binding: ItemRatingBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind() {
-            binding.ratingTitle.text = "How do you rate Trackingo service?"
+            binding.ratingTitle.text = RATING_KEY
 
             val selectedDrawableLeft = R.drawable.rated_square_left_box
             val selectedDrawable = R.drawable.rated_square_box
@@ -71,7 +74,7 @@ class RatingFeedbackReviewAdapter(private val clickListener: FeedbackRatingClick
 
         private fun handleRatingClick(rating: Int) {
             selectedRating = rating
-            ratingMap["Rating"] = selectedRating
+            ratingMap[RATING_KEY] = selectedRating
             clickListener.onRatingClicked(rating)
             bind()
         }

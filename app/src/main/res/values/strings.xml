@@ -47,4 +47,5 @@
     <string name="message">message</string>
     <string name="loading">Loading...</string>
     <string name="ok">OK</string>
+    <string name="share_bus_location_text">Hi, Drop off Location details has been shared with you</string>
 </resources>
