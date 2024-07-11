@@ -12,13 +12,8 @@ import com.bitlasoft.trackingo.adapter.RatingFeedbackReviewAdapter
 import com.bitlasoft.trackingo.databinding.FeedbackDownRequestLayoutBinding
 import com.bitlasoft.trackingo.domain.pojo.feedback_review.response.FeedbackType2
 import com.bitlasoft.trackingo.utils.FeedbackRatingClickListener
-import com.bitlasoft.trackingo.utils.RetrofitInstanceFeedback
 import com.bitlasoft.trackingo.viewModel.FeedbackViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import retrofit2.HttpException
 
 class FeedbackFutureExpectationFragment : Fragment(), FeedbackRatingClickListener {
 
@@ -53,8 +48,9 @@ class FeedbackFutureExpectationFragment : Fragment(), FeedbackRatingClickListene
     private fun setupObserver() {
         feedbackViewModel.submitRatingFeedbackFutureExpectations.observe(requireActivity()) {
             when(it.status) {
-                200 -> Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
-                else -> Toast.makeText(requireContext(), "Failed to submit feedback. Please try again later.", Toast.LENGTH_SHORT).show()
+                200 -> showToast(it.message)
+                500 -> showToast(it.error_message)
+                else -> showToast("Failed to submit feedback. Please try again later.")
             }
             findNavController().popBackStack()
             adapter.clearAllRatings()

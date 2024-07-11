@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bitlasoft.trackingo.R
+import com.bitlasoft.trackingo.adapter.CustomInfoWindowAdapter
 import com.bitlasoft.trackingo.databinding.ZoomedmapFragmentBinding
 import com.bitlasoft.trackingo.viewModel.CoordinatesViewModel
 import com.bitlasoft.trackingo.viewModel.LocationTimeViewModel
@@ -26,7 +27,6 @@ class ZoomedMapFragment: Fragment() {
     private val locTimeViewModel: LocationTimeViewModel by viewModel()
     private var googleMap: GoogleMap? = null
     private var mapView: MapView? = null
-    var isPnr = false
     var shortKey = ""
 
     override fun onCreateView(
@@ -67,7 +67,7 @@ class ZoomedMapFragment: Fragment() {
         val arrivalTime: MutableList<String?> = mutableListOf()
         val deptTime: MutableList<String?> = mutableListOf()
         val scheduledTime: MutableList<String?> = mutableListOf()
-        var speed: Int = 0
+        var speed: Int? = 0
         var dateTime: String? = null
 
         locTimeViewModel.fetchDetailsResponse.observe(requireActivity()) { response ->
@@ -86,14 +86,14 @@ class ZoomedMapFragment: Fragment() {
                                 it[1]!!
                             )
                         )
-                        .title("speed: $speed\n km/hr \n Time: $dateTime")
+                        .title("speed: $speed\n km/hr \n\n Time: $dateTime")
                         .snippet("")
                         .icon(
                             BitmapDescriptorFactory.fromBitmap(
                                 resizeCustomMarker(
                                     R.drawable.bus,
-                                    100,
-                                    120
+                                    85,
+                                    100
                                 )
                             )
                         )
@@ -103,10 +103,12 @@ class ZoomedMapFragment: Fragment() {
                             com.google.android.gms.maps.model.LatLng(
                                 it[0]!!,
                                 it[1]!!
-                            ), 14f
+                            ), 16f
                         )
                     )
                 }
+
+                googleMap?.setInfoWindowAdapter(CustomInfoWindowAdapter(requireContext()))
 
                 _binding.locationBtn.setOnClickListener {
                     response.currentCoordinates?.currentLoc?.let {
@@ -123,7 +125,7 @@ class ZoomedMapFragment: Fragment() {
                                 BitmapDescriptorFactory.fromBitmap(
                                     resizeCustomMarker(
                                         R.drawable.bus,
-                                        80,
+                                        85,
                                         100
                                     )
                                 )
@@ -134,7 +136,7 @@ class ZoomedMapFragment: Fragment() {
                                 com.google.android.gms.maps.model.LatLng(
                                     it[0]!!,
                                     it[1]!!
-                                ), 14f
+                                ), 18f
                             )
                         )
                     }

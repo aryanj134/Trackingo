@@ -29,7 +29,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="50dp"
             android:text="@string/ok"
-            android:textColor="@color/blue_tracking_o"
+            android:textColor="@color/blue_trackingo"
             app:layout_constraintEnd_toEndOf="@id/dialogMessage"
             app:layout_constraintTop_toBottomOf="@+id/dialogMessage"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -68,6 +68,7 @@ class FeedbackFragment : Fragment(), RatingClickListener {
         feedbackViewModel.submitRatingsFeedback.observe(requireActivity()) {
             when(it.status) {
                 200 -> showToast(it.message)
+                500 -> showToast(it.error_message)
                 else -> showToast("Failed to submit feedback. Please try again later.")
             }
             findNavController().popBackStack()

@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
     private var internetConnectivity: InternetConnectivity? = null
     private val mainViewModel: MainViewModel by viewModel()
 
-    companion object{
+    companion object {
         var isInternet: MutableSharedFlow<Boolean> = MutableSharedFlow<Boolean>()
     }
 
@@ -30,11 +30,9 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        internetConnectivity = InternetConnectivity()
-        registerReceiver(internetConnectivity, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
-
         // Initialize NavHostFragment and NavController
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container_view) as NavHostFragment
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container_view) as NavHostFragment
         navController = navHostFragment.navController
 
         if (savedInstanceState == null) {
@@ -46,11 +44,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        internetConnectivity = InternetConnectivity()
+        registerReceiver(
+            internetConnectivity,
+            IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        )
+    }
+
     override fun onPause() {
         super.onPause()
-        unregisterReceiver(internetConnectivity)
+        if (internetConnectivity != null)
+            unregisterReceiver(internetConnectivity)
 
     }
+
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp() || super.onSupportNavigateUp()
     }

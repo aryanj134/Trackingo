@@ -3,7 +3,6 @@ package com.bitlasoft.trackingo.fragment
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -13,8 +12,6 @@ import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.ClickableSpan
-import android.text.style.StyleSpan
-import android.text.style.UnderlineSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -29,7 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bitlasoft.trackingo.R
 import com.bitlasoft.trackingo.activity.MainActivity
 import com.bitlasoft.trackingo.adapter.BpDpAdapter
-import com.bitlasoft.trackingo.databinding.ItemLayoutBinding
+import com.bitlasoft.trackingo.adapter.CustomInfoWindowAdapter
 import com.bitlasoft.trackingo.databinding.MaptrackingoFragmentBinding
 import com.bitlasoft.trackingo.databinding.TrankingoDialogPnrBinding
 import com.bitlasoft.trackingo.utils.isInternetAvailable
@@ -47,7 +44,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class MapTrackingoFragment : Fragment() {
 
     private val _binding by lazy { MaptrackingoFragmentBinding.inflate(layoutInflater) }
-    private lateinit var itemLayoutBinding: ItemLayoutBinding
     private val locTimeViewModel: LocationTimeViewModel by viewModel()
     private val coordinatesViewModel: CoordinatesViewModel by viewModel()
     private val panicViewModel: PanicViewModel by viewModel()
@@ -144,11 +140,6 @@ class MapTrackingoFragment : Fragment() {
                 putString("shortKey", shortKey)
             })
         }
-        //Download App Button
-        _binding.downloadBtns.setOnClickListener {
-            showToast("App not available for this operator")
-        }
-
     }
 
     //Dialog Box for the first time appearance of Tracking Page
@@ -172,7 +163,7 @@ class MapTrackingoFragment : Fragment() {
 
         alertDialogBuilder.setPositiveButton("Yes") { dialog, _ ->
             // Handle the positive button click
-            panicViewModel.getPanicResponse("abcd", true)
+            panicViewModel.getPanicResponse(shortKey, true)
             setUpPanicObserver()
         }
         alertDialogBuilder.setNegativeButton("Cancel") { dialog, _ ->
@@ -204,11 +195,10 @@ class MapTrackingoFragment : Fragment() {
 
     private fun textSpan() {
         // Initialize SpannableStringBuilders
-        val spannableStringBuilder1 = SpannableStringBuilder(_binding.feedbackText.text)
-        val spannableStringBuilder2 = SpannableStringBuilder(_binding.disclaimerText.text)
+        val spannableStringBuilder1 = SpannableStringBuilder(_binding.feedbackView.text)
+        val spannableStringBuilder2 = SpannableStringBuilder(_binding.disclaimerView.text)
 
         // Creating spans
-        val boldSpan = StyleSpan(Typeface.BOLD)
         val sizeSpan = AbsoluteSizeSpan(28)
         // Apply ClickableSpan to the "feedback" part
         val clickableSpan1 = object : ClickableSpan() {
@@ -218,7 +208,6 @@ class MapTrackingoFragment : Fragment() {
                     putString("shortKey", shortKey)
                 })
             }
-
             override fun updateDrawState(ds: TextPaint) {
                 super.updateDrawState(ds)
                 ds.color = ContextCompat.getColor(context!!, R.color.blue) // Change the link color
@@ -241,39 +230,26 @@ class MapTrackingoFragment : Fragment() {
         }
 
         // Apply spans to feedbackText1
-        _binding.feedbackText.text.let {
+        _binding.feedbackView.text.let {
             val startFeedback = it.indexOf("feedback")
             val endFeedback = startFeedback + "feedback".length
-
-            val startTrackingo = it.indexOf("Trackingo.")
-            val endTrackingo = startTrackingo + "Trackingo".length
 
             val startHere = it.indexOf("here")
             val endHere = startHere + "here".length
 
-            val startBus = it.indexOf("Bus")
-            val endBus = startBus + "Bus".length
-
-            val startOperator = it.indexOf("Operator.")
-            val endOperator = startOperator + "Operator.".length
-
             spannableStringBuilder1.applySpans(listOf(clickableSpan1), startFeedback, endFeedback)
             spannableStringBuilder1.applySpans(listOf(clickableSpan2), startHere, endHere)
-            spannableStringBuilder1.applySpans(listOf(boldSpan), startBus, endBus)
-            spannableStringBuilder1.applySpans(listOf(boldSpan), startOperator, endOperator)
-            spannableStringBuilder1.applySpans(listOf(boldSpan), startTrackingo, endTrackingo)
         }
 
-        _binding.disclaimerText.text.let {
-            spannableStringBuilder2.applySpans(listOf(boldSpan, UnderlineSpan(), sizeSpan), 0, 10)
+        _binding.disclaimerView.text.let {
+            spannableStringBuilder2.applySpans(listOf(sizeSpan), 0, 10)
         }
         // Assign the spannable text to TextViews
-        _binding.feedbackText.text = spannableStringBuilder1
-        _binding.disclaimerText.text = spannableStringBuilder2
+        _binding.feedbackView.text = spannableStringBuilder1
+        _binding.disclaimerView.text = spannableStringBuilder2
 
         // Ensure movement method is set
-        _binding.feedbackText.movementMethod = LinkMovementMethod.getInstance()
-        _binding.disclaimerText.movementMethod = LinkMovementMethod.getInstance()
+        _binding.feedbackView.movementMethod = LinkMovementMethod.getInstance()
     }
 
     private fun resizeCustomMarker(drawableRes: Int, width: Int, height: Int): Bitmap {
@@ -284,19 +260,30 @@ class MapTrackingoFragment : Fragment() {
         val arrivalTime: MutableList<String?> = mutableListOf()
         val deptTime: MutableList<String?> = mutableListOf()
         val scheduledTime: MutableList<String?> = mutableListOf()
-        var speed: Int = 0
+        var speed: Int? = 0
         var dateTime: String? = null
 
-        locTimeViewModel.fetchDetailsResponse.observe(requireActivity()) { response ->
+        locTimeViewModel?.fetchDetailsResponse?.observe(requireActivity()) { response ->
             when (response?.status) {
                 200 -> {
                     _binding.loadingBar.mainProgressBarLayout.visibility = View.GONE
                     Log.d("tag", "Fetching data of location and time")
                     _binding.scrollView.visibility = View.VISIBLE
-                    val adapter = BpDpAdapter(emptyList())
+                    try {
+                      val position =   response.locationTimeDetails?.indexOfFirst {
+                            it.id == response.curr_sp_id
+                        }
+                        if (position!=-1) {
+                            response.locationTimeDetails?.forEachIndexed { index, locTime ->
+                                locTime.isCross = index <= (position?:0)
+                            }
+                        }
+                    }catch (_:Exception){}
+                    val adapter = BpDpAdapter(response.locationTimeDetails?: emptyList())
+                    adapter.setSpId(response.curr_sp_id?:-1)
+                    adapter.setIsPassed(response.is_passed)
                     _binding.recyclerView.adapter = adapter
 
-                    response.locationTimeDetails?.let { adapter.updateData(it) }
                     for (i in response.locationTimeDetails?.indices!!) {
                         arrivalTime.add(response.locationTimeDetails[i].arrivalTime)
                         deptTime.add(response.locationTimeDetails[i].deptTime)
@@ -317,8 +304,8 @@ class MapTrackingoFragment : Fragment() {
                                 BitmapDescriptorFactory.fromBitmap(
                                     resizeCustomMarker(
                                         R.drawable.bus,
-                                        100,
-                                        120
+                                        85,
+                                        100
                                     )
                                 )
                             )
@@ -333,6 +320,8 @@ class MapTrackingoFragment : Fragment() {
                         )
                     }
 
+                    googleMap?.setInfoWindowAdapter(CustomInfoWindowAdapter(requireContext()))
+
                     _binding.locationBtn.setOnClickListener {
                         response.currentCoordinates?.currentLoc?.let {
                             val markerOptions = MarkerOptions()
@@ -342,14 +331,14 @@ class MapTrackingoFragment : Fragment() {
                                         it[1]!!
                                     )
                                 )
-                                .title("speed: $speed\n km/hr \n Time: $dateTime")
+                                .title("speed: $speed\nkm/hr \n\nTime: $dateTime")
                                 .snippet("")
                                 .icon(
                                     BitmapDescriptorFactory.fromBitmap(
                                         resizeCustomMarker(
                                             R.drawable.bus,
-                                            100,
-                                            120
+                                            85,
+                                            100
                                         )
                                     )
                                 )
@@ -359,37 +348,9 @@ class MapTrackingoFragment : Fragment() {
                                     com.google.android.gms.maps.model.LatLng(
                                         it[0]!!,
                                         it[1]!!
-                                    ), 14f
+                                    ), 12f
                                 )
                             )
-                        }
-                    }
-                    for (i in response.locationTimeDetails.indices) {
-                        val itemView = _binding.recyclerView.findViewHolderForAdapterPosition(i)?.itemView
-                        if (itemView != null) {
-                            itemLayoutBinding = ItemLayoutBinding.bind(itemView)
-                            if (response.curr_sp_id == response.locationTimeDetails[i].id) {
-                                itemLayoutBinding.busTracker.visibility = View.VISIBLE
-                                if (response.is_passed == false)
-                                    itemLayoutBinding.busTracker.translationX = itemLayoutBinding.trackingDividerMain.width * 0.15f
-                                else
-                                    itemLayoutBinding.circleView.translationX = itemLayoutBinding.circleView.width * 0.5f
-                            } else {
-                            itemLayoutBinding.busTracker.visibility = View.INVISIBLE
-                            }
-                            if (response.locationTimeDetails[i].skippedStatus == true) {
-                                val firstItemView =
-                                    _binding.recyclerView.findViewHolderForAdapterPosition(0)?.itemView
-                                if (firstItemView != null) {
-                                    itemLayoutBinding = ItemLayoutBinding.bind(firstItemView)
-                                    itemLayoutBinding.busTracker.visibility = View.VISIBLE
-                                    itemLayoutBinding.busTracker.translationX =
-                                        itemLayoutBinding.trackingDividerMain.width * 0.5f
-                                    itemLayoutBinding.busTracker.animate().translationX(itemLayoutBinding.trackingDividerMain.width * 0.5f).setDuration(1000).start()
-                                    itemLayoutBinding.circleView.background =
-                                        ContextCompat.getDrawable(requireContext(), R.color.red)
-                                }
-                            }
                         }
                     }
                 }
@@ -521,11 +482,11 @@ class MapTrackingoFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         isDialogShown = false
-        mapView?.onPause()
+//        mapView?.onPause()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mapView?.onDestroy()
+//        mapView?.onDestroy()
     }
 }

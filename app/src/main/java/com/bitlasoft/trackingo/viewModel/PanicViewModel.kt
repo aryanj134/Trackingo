@@ -21,6 +21,7 @@ class PanicViewModel(private val panicRepository: PanicRepository): ViewModel() 
                 if (response.isSuccessful) {
                     _panicResponse.postValue(response.body())
                 } else {
+                    _panicResponse.postValue(response.body())
                 }
             } catch (e: Exception) {
                 Log.e("tag", "Error submitting panic", e)

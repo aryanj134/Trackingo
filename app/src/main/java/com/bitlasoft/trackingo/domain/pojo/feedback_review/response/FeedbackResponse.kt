@@ -6,5 +6,7 @@ data class FeedbackResponse(
         @SerializedName("status")
         val status: Int?,
         @SerializedName("message")
-        val message: String?
+        val message: String?,
+        @SerializedName("error_message")
+        val error_message: String?
 )

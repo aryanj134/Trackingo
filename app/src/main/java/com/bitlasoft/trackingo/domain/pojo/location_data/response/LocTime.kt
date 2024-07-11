@@ -33,14 +33,14 @@ data class LocTime (
     @SerializedName("service_place_name")
     val title : String?,
 
-    @SerializedName("running_status")
-    val subtitle: String?,
-
     @SerializedName("id")
     val id: Int?,
 
     @SerializedName("skipped")
     val skippedStatus: Boolean?,
+
+    @SerializedName("running_status")
+    val runningStatus: String?,
 
     @SerializedName("color")
     val iconState: String?,
@@ -54,5 +54,9 @@ data class LocTime (
     @SerializedName("departure_time")
     val deptTime: String?,
 
-    var isBusIconVisible: Boolean? = false
+    @SerializedName("delay_time")
+    val delayTime: Int?,
+
+    var isBusIconVisible: Boolean? = false,
+    var isCross:Boolean=false
 )
